@@ -24,6 +24,7 @@ package com.gawk.Engine {
 		
 		protected var wallId:String;
 		protected var serverLocation:String;
+		protected var mediaServerLocation:String;
 		protected var serviceLocation:String;
 		protected var binaryLocation:String;
 		protected var randomWallId:String;
@@ -35,9 +36,9 @@ package com.gawk.Engine {
 		protected var retrievingLoggedInMember:Boolean = false;
 		
 		public function Engine(serviceLocation:String, wallId:String, loggedInAtInit:Boolean, testSettings:Boolean) {
+			this.logger = new Logger(this);
 			this.member = new Member(this);
 			this.mediaServer = new MediaServer(this);
-			this.logger = new Logger(this);
 			
 			this.serviceLocation = serviceLocation;
 			this.wallId = wallId;
@@ -45,7 +46,7 @@ package com.gawk.Engine {
 			
 			if (loggedInAtInit) {
 				this.addEventListener(EngineEvent.WALL_CONFIG_LOADED, function (event:EngineEvent):void {
-					getLoggedInMember();
+					this.member.retrieveLoggedInMember();
 				});
 			}
 			
@@ -53,12 +54,12 @@ package com.gawk.Engine {
 		}
 		
 		protected function retrieveWallConfig():void {
+			this.logger.addLog(Logger.LOG_ACTIVITY, "Retrieving Wall Config from " + this.serviceLocation);
 			var variables:URLVariables = new URLVariables();
 			if (this.isWallIdSet()) {
-				variables.Action = "Wall.GetWallVideos";
 				variables.WallSecureId = this.getWallId();
 			} else {
-				variables.Action = "Wall.GetMainWallVideos";
+				variables.Action = "Flash.InitApplication";
 			}
 			
 			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
@@ -70,22 +71,26 @@ package com.gawk.Engine {
 		protected function onWallConfigLoaded(event:Event):void {
 			try {
 				this.config = JSON.deserialize(event.target.data);
-				if (!this.config.success) {
-					this.logger.addLog(Logger.LOG_ERROR, "Wall config not loaded");
-					return;
-				}
-				this.mediaServerLocation = this.config.mediaServerLocation;
-				this.binaryLocation = this.config.binaryLocation
-				
-				this.videos = this.config.videos;
-				
-				this.logger.addLog(Logger.LOG_ACTIVITY, "Wall Config loaded");
-				this.logger.addLog(Logger.LOG_ERROR, "TODO: Connect to Media Server on demand"); //TODO:
-				this.mediaServer.connectToMediaServer();
-				this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_LOADED));
 			} catch (error:Error) {
-				this.logger.addLog(Logger.LOG_ERROR, "Could not deserialize wall config");
+				this.logger.addLog(Logger.LOG_ERROR, "Could not deserialize wall config: " + event.target.data);
+				return;
 			}
+			if (!this.config.success) {
+				this.logger.addLog(Logger.LOG_ERROR, "Wall config failure, errors: " + event.target.data);
+				return;
+			}
+			
+			this.mediaServerLocation = this.config.mediaServerLocation;
+			this.binaryLocation = this.config.binaryLocation
+			if (!this.mediaServerLocation || !this.binaryLocation) {
+				throw new Error("Must provide mediaServerLocation and binaryLocation: " + event.target.data);
+			}
+			this.videos = this.config.videos;
+			
+			this.logger.addLog(Logger.LOG_ACTIVITY, "Wall Config loaded. Video count: " + this.videos.length);
+			this.logger.addLog(Logger.LOG_ERROR, "TODO: Connect to Media Server on demand"); //TODO:
+			this.mediaServer.connectToMediaServer();
+			this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_LOADED));
 		}
 		
 		public function saveVideo(filename:String):void {
@@ -152,11 +157,13 @@ package com.gawk.Engine {
 		
 		public function getLoggedInMember():void {
 			if (!retrievingLoggedInMember) {
+				this.logger.addLog(Logger.LOG_ACTIVITY, "Retrieving logged in Member");
 				retrievingLoggedInMember = true;
 				var variables:URLVariables = new URLVariables();
 				variables.Action = "Member.GetLoggedInMember";
+				
 				if (this.isTestSettings()) {
-					variables.TestSettings = "true";	
+					variables.Token = "test1234";
 				}
 				
 				var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
@@ -175,7 +182,7 @@ package com.gawk.Engine {
 					this.dispatchEvent(new EngineEvent(EngineEvent.MEMBER_LOADED, response));
 					this.logger.addLog(Logger.LOG_ACTIVITY, "Member loaded success");
 				} else {
-					this.logger.addLog(Logger.LOG_ERROR, "Member loaded failed");
+					this.logger.addLog(Logger.LOG_ERROR, "Member loaded failed: " + event.target.data);
 				}
 			} catch (error:Error) {
 				this.logger.addLog(Logger.LOG_ERROR, "Member Loaded response: " + event.target.data); 

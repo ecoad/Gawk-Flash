@@ -1,16 +1,4 @@
-<!-- saved from url=(0014)about:internet -->
 <html lang="en">
-
-<!-- 
-Smart developers always View Source. 
-
-This application was built using Adobe Flex, an open source framework
-for building rich Internet applications that get delivered via the
-Flash Player or to desktops via Adobe AIR. 
-
-Learn more about Flex at http://flex.org 
-// -->
-
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
@@ -26,7 +14,7 @@ Learn more about Flex at http://flex.org
 <!--  END Browser History required section -->
 
 <style>
-body { margin: 0px; overflow:hidden }
+	body { margin: 0px; overflow:hidden }
 </style>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -43,26 +31,23 @@ var requiredRevision = 124;
 </script>
 </head>
 
-<body scroll="no">
 <ul>
-	<li><a href="#" onclick="recordNew()">New Gawk</a></li>
-	<li><a href="#">New Wall</a></li>
-	<li><a href="#">About</a></li>
-	<li><a href="#" onclick="loginMember()">Login Member</a></li>
-	<li><a href="#" onclick="logOutMember()">Logout Member</a></li>
+  <li><a href="#" onclick="recordNew();">Record</a></li>
+  <li><a href="#" onclick="loginMember();">Login Member</a></li>
+  <li><a href="#" onclick="logOutMember();">Logout Member</a></li>
 </ul>
 <script type="text/javascript">
-	function recordNew() {
-		document.getElementById('Gawk').recordNewFromExternal();
-	}
+  function recordNew() {
+    document.getElementById('GawkFlash').recordNewFromExternal();
+  }
 
-	function loginMember() {
-		document.getElementById('Gawk').logInFromExternal();
-	}
+  function loginMember() {
+    document.getElementById('GawkFlash').logInFromExternal();
+  }
 
-	function logOutMember() {
-		document.getElementById('Gawk').logOutFromExternal();
-	}
+  function logOutMember() {
+    document.getElementById('GawkFlash').logOutFromExternal();
+  }
 </script>
 <script language="JavaScript" type="text/javascript">
 <!--

@@ -3,7 +3,7 @@ package com.gawk.Member {
 	import com.gawk.Engine.Event.EngineEvent;
 	import com.gawk.Logger.Logger;
 	import com.gawk.Member.Event.MemberEvent;
-	import com.utils.sha1Encrypt;
+	import com.utils.JSON;
 	
 	import flash.events.EventDispatcher;
 	import flash.external.ExternalInterface;
@@ -12,9 +12,19 @@ package com.gawk.Member {
 		
 		protected var engine:Engine;
 		protected var id:int = 0;
+		protected var memberData:Object = {
+			alias: "",
+			emailAddress: "",
+			facebookId: null,
+			firstName: "",
+			lastName: "",
+			secureId: "",
+			token: ""
+		}
 		
 		public function Member(engine:Engine) {
 			this.engine = engine;
+			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Member object init");
 			this.addEventListeners();
 		}
 		
@@ -23,32 +33,28 @@ package com.gawk.Member {
 			ExternalInterface.addCallback("logOutFromExternal", this.onLogOutFromExternal);
 		}
 		
-		protected function retrieveLoggedInMember():void {
-			this.engine.getLoggedInMember();
-			this.engine.addEventListener(EngineEvent.MEMBER_LOADED, this.onMemberLoaded);
-		}
-		
 		protected function onLogInFromExternal():void {
 			this.retrieveLoggedInMember();
 		}
 		
 		protected function onLogOutFromExternal():void {
-			this.id = 0;
+			this.memberData.secureId = "";
 			this.engine.dispatchEvent(new MemberEvent(MemberEvent.MEMBER_LOGGED_OUT));
 			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Member logged out");
 		}
 		
+		public function retrieveLoggedInMember():void {
+			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Retrieve Logged in member initiated");
+			this.engine.getLoggedInMember();
+			this.engine.addEventListener(EngineEvent.MEMBER_LOADED, this.onMemberLoaded);
+		}
+		
 		protected function onMemberLoaded(event:EngineEvent):void {
 			this.engine.removeEventListener(EngineEvent.MEMBER_LOADED, this.onMemberLoaded);
-			var sha1EncryptClass:sha1Encrypt = new sha1Encrypt(true);
-			var response:Object = event.data;
-			var memberId:int = response.member.id
+			this.memberData = event.data.member;
 			
-			if (response.key == sha1Encrypt.encrypt(memberId.toString() + "34 sangrita")) {
-				this.mapMemberData(response.member);
-				this.engine.dispatchEvent(new MemberEvent(MemberEvent.MEMBER_LOGGED_IN));
-				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Member logged in: " + memberId);
-			}
+			this.engine.dispatchEvent(new MemberEvent(MemberEvent.MEMBER_LOGGED_IN));
+			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Member logged in: " + JSON.serialize(event.data.member));
 		}
 		
 		protected function mapMemberData(memberData:Object):void {

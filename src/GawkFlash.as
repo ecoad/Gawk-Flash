@@ -31,7 +31,11 @@ package {
 		protected function assignStartupSettings():void {
 			this.apiLocation = this.loaderInfo.parameters.apiLocation;
 			this.wallId = this.loaderInfo.parameters.wallId;
-			this.loggedInAtInit = this.loaderInfo.parameters.loggedInAtInit; 
+			this.loggedInAtInit = this.loaderInfo.parameters.loggedInAtInit;
+			
+			if (!this.apiLocation) {
+				throw new Error("Must provide API Location");
+			} 
 			this.testSettings = true;
 		}
 		

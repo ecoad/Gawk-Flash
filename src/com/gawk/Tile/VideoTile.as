@@ -9,6 +9,7 @@ package com.gawk.Tile {
 	
 	import flash.display.Loader;
 	import flash.display.MovieClip;
+	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.events.NetStatusEvent;
 	import flash.media.SoundTransform;
@@ -38,6 +39,26 @@ package com.gawk.Tile {
 		}
 		
 		public function loadVideo():void {
+			this.initialiseLoadVideo();
+			
+			this.addMemberUIControls();
+			
+			if (this.newlySubmitted) {
+				this.addRecordUI();
+			}
+			
+			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_IN, function (event:MemberEvent):void {
+				allowTileMemberPanelEvents();
+			});
+			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_OUT, function (event:MemberEvent):void {
+				disallowTileMemberPanelEvents();
+			});
+			
+			this.playVideo();
+		}
+		
+		protected function initialiseLoadVideo():void {
+			//TODO: Can we share this net connection?
 			var netConnection:NetConnection = new NetConnection(); 
 			netConnection.connect(null); 
 			
@@ -45,36 +66,12 @@ package com.gawk.Tile {
 			this.netStream.soundTransform = new SoundTransform(0);
 			this.netStream.addEventListener(NetStatusEvent.NET_STATUS, this.onNetStatus);
 			this.netStream.bufferTime = 1;
-			
 			var infoClient:Object = new Object();
-			infoClient.onMetaData = function():void {}; // Container for MetaData
-			
+			infoClient.onMetaData = function():void {}; // Container for video MetaData
 			this.netStream.client = infoClient;
 			
 			this.video = new Video();
-			
 			this.addChild(this.video);
-			
-			this.addMemberUIControls();
-			
-			if (this.parentTile.getEngine().getMember().getId() == 0) {
-				this.disallowTileMemberPanelEvents();
-			}
-			
-			if (this.newlySubmitted) {
-				this.addRecordUI();
-				this.disallowTileMemberPanelEvents();
-			}
-			 
-			this.playVideo();
-			
-			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_IN, function (event:MemberEvent):void {
-				allowTileMemberPanelEvents();
-			});
-			
-			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_OUT, function (event:MemberEvent):void {
-				disallowTileMemberPanelEvents();
-			});
 		}
 		
 		protected function playVideo():void {
@@ -83,7 +80,6 @@ package com.gawk.Tile {
 			var fullVideoLocation:String = this.parentTile.getEngine().getBinaryLocation() + this.videoData.getFilename(); 
 			
 			this.netStream.play(fullVideoLocation);
-			
 			this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "Loading video: " + fullVideoLocation);
 		}
 		
@@ -122,8 +118,6 @@ package com.gawk.Tile {
 			this.tileMemberPanel = new TileMemberPanel(this);
 			this.addChild(this.tileMemberPanel.getPanel());
 			this.tileMemberPanel.getPanel().visible = false;
-			
-			this.allowTileMemberPanelEvents();
 		}
 		
 		protected function addReRecordButton():void {
@@ -149,24 +143,25 @@ package com.gawk.Tile {
 		protected function onNetStatus(event:NetStatusEvent):void {
 			switch (event.info.code) {
 				case "NetStream.Play.Start":
-					this.onVideoStarted();
+					this.onVideoLoaded();
 					break;
 				case "NetStream.Play.Stop":
 					netStream.seek(0); // Loop video playback
 					break;
 				case "NetStream.Play.StreamNotFound":
 					this.parentTile.getEngine().logger.addLog(Logger.LOG_ERROR, this.videoData.getFilename() + ": NetStream.Play.StreamNotFound");
+					this.onVideoLoaded();
 					break;					
 				default:
 					//this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, this.videoLocation + ": " + event.info.code); 
 			}
 		}
 		
-		protected function onVideoStarted():void {
+		protected function onVideoLoaded():void {
 			this.video.width = Tile.tileWidth;
 			this.video.height = Tile.tileHeight;
 			
-			this.parentTile.getEngine().dispatchEvent(new TileEvent(TileEvent.TILE_LOADED, null));
+			this.parentTile.getEngine().dispatchEvent(new TileEvent(TileEvent.TILE_LOADED));
 		}
 		
 		protected function onReRecordButtonClick(event:MouseEvent):void {
