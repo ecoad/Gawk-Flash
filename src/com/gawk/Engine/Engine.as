@@ -1,0 +1,238 @@
+package com.gawk.Engine {
+	import com.gawk.Engine.Event.EngineEvent;
+	import com.gawk.Logger.Logger;
+	import com.gawk.MediaServer.MediaServer;
+	import com.gawk.Member.Action.Action;
+	import com.gawk.Member.Member;
+	import com.gawk.UI.TileMemberPanel.Event.TileMemberPanelEvent;
+	import com.gawk.URLLoader.CustomURLLoader;
+	import com.utils.JSON;
+	
+	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
+	import flash.net.URLRequestMethod;
+	import flash.net.URLVariables;
+	
+	public class Engine	extends EventDispatcher {
+		
+		public var logger:Logger;
+		protected var member:Member;
+		protected var mediaServer:MediaServer;
+		
+		protected var config:Object;
+		
+		protected var wallId:String;
+		protected var serverLocation:String;
+		protected var serviceLocation:String;
+		protected var binaryLocation:String;
+		protected var randomWallId:String;
+		
+		protected var videos:Array = new Array();
+		
+		protected var testSettings:Boolean;
+		
+		protected var retrievingLoggedInMember:Boolean = false;
+		
+		public function Engine(serviceLocation:String, wallId:String, loggedInAtInit:Boolean, testSettings:Boolean) {
+			this.member = new Member(this);
+			this.mediaServer = new MediaServer(this);
+			this.logger = new Logger(this);
+			
+			this.serviceLocation = serviceLocation;
+			this.wallId = wallId;
+			this.testSettings = testSettings;
+			
+			if (loggedInAtInit) {
+				this.addEventListener(EngineEvent.WALL_CONFIG_LOADED, function (event:EngineEvent):void {
+					getLoggedInMember();
+				});
+			}
+			
+			this.retrieveWallConfig();
+		}
+		
+		protected function retrieveWallConfig():void {
+			var variables:URLVariables = new URLVariables();
+			if (this.isWallIdSet()) {
+				variables.Action = "Wall.GetWallVideos";
+				variables.WallSecureId = this.getWallId();
+			} else {
+				variables.Action = "Wall.GetMainWallVideos";
+			}
+			
+			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+			urlLoader.addEventListener(Event.COMPLETE, this.onWallConfigLoaded);
+			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
+			urlLoader.loadRequest(URLRequestMethod.GET, variables); 
+		}
+		
+		protected function onWallConfigLoaded(event:Event):void {
+			try {
+				this.config = JSON.deserialize(event.target.data);
+				if (!this.config.success) {
+					this.logger.addLog(Logger.LOG_ERROR, "Wall config not loaded");
+					return;
+				}
+				this.mediaServerLocation = this.config.mediaServerLocation;
+				this.binaryLocation = this.config.binaryLocation
+				
+				this.videos = this.config.videos;
+				
+				this.logger.addLog(Logger.LOG_ACTIVITY, "Wall Config loaded");
+				this.logger.addLog(Logger.LOG_ERROR, "TODO: Connect to Media Server on demand"); //TODO:
+				this.mediaServer.connectToMediaServer();
+				this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_LOADED));
+			} catch (error:Error) {
+				this.logger.addLog(Logger.LOG_ERROR, "Could not deserialize wall config");
+			}
+		}
+		
+		public function saveVideo(filename:String):void {
+			var variables:URLVariables = new URLVariables();
+			variables.Action = "Video.SiteUpload";
+			variables.Filename = filename;
+			variables.WallId = this.getWallId();
+			variables.MemberId = this.member.getId();
+			
+			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+			urlLoader.addEventListener(Event.COMPLETE, this.onSaveVideoResponse);
+			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
+			urlLoader.loadRequest(URLRequestMethod.POST, variables); 
+		}
+		
+		protected function onSaveVideoResponse(event:Event):void {
+			try {
+				var response:Object = JSON.deserialize(event.target.data);
+				
+				if (response.success) {
+					this.dispatchEvent(new EngineEvent(EngineEvent.VIDEO_SAVED, response));
+					this.logger.addLog(Logger.LOG_ACTIVITY, "Video saved");
+				} else {
+					this.logger.addLog(Logger.LOG_ERROR, "Video not saved");
+					for each (var error:String in response.errors) {
+						this.logger.addLog(Logger.LOG_ERROR, error);
+					}
+				}
+			} catch (error:Error) {
+				this.logger.addLog(Logger.LOG_ERROR, "Could not deserialize Video response"); 
+			}
+		}
+		
+		public function onMemberPanelAction(event:TileMemberPanelEvent):void {
+			var action:Action = event.action;
+			
+			var variables:URLVariables = new URLVariables();
+			variables.Action = "Member.SendMemberPanelAction";
+			variables.MemberAction = action.getAction();
+			variables.VideoId = action.getId();
+			variables.MemberId = action.getMemberId();
+			
+			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+			urlLoader.addEventListener(Event.COMPLETE, this.onSendMemberPanelActionResponse);
+			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
+			urlLoader.loadRequest(URLRequestMethod.POST, variables);
+			
+			this.logger.addLog(Logger.LOG_ACTIVITY, "Requesting Member Panel Action: " + action.getAction());
+		}
+		
+		protected function onSendMemberPanelActionResponse(event:Event):void {
+			try {
+				var response:Object = JSON.deserialize(event.target.data);
+				
+				if (response.success) {
+					this.logger.addLog(Logger.LOG_ACTIVITY, "Member Panel Action success");
+				} else {
+					this.logger.addLog(Logger.LOG_ERROR, "Member Panel Action failed");
+				}
+			} catch (error:Error) {
+				this.logger.addLog(Logger.LOG_ERROR, "Member Panel Action response: " + event.target.data); 
+			}
+		}
+		
+		public function getLoggedInMember():void {
+			if (!retrievingLoggedInMember) {
+				retrievingLoggedInMember = true;
+				var variables:URLVariables = new URLVariables();
+				variables.Action = "Member.GetLoggedInMember";
+				if (this.isTestSettings()) {
+					variables.TestSettings = "true";	
+				}
+				
+				var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+				urlLoader.addEventListener(Event.COMPLETE, this.onLoggedInMemberResponse);
+				urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
+				urlLoader.loadRequest(URLRequestMethod.GET, variables);
+			}
+		}
+		
+		protected function onLoggedInMemberResponse(event:Event):void {
+			retrievingLoggedInMember = false;
+			try {
+				var response:Object = JSON.deserialize(event.target.data);
+				
+				if (response.success) {
+					this.dispatchEvent(new EngineEvent(EngineEvent.MEMBER_LOADED, response));
+					this.logger.addLog(Logger.LOG_ACTIVITY, "Member loaded success");
+				} else {
+					this.logger.addLog(Logger.LOG_ERROR, "Member loaded failed");
+				}
+			} catch (error:Error) {
+				this.logger.addLog(Logger.LOG_ERROR, "Member Loaded response: " + event.target.data); 
+			}			
+		}
+		
+		protected function onIOError(event:IOErrorEvent):void {
+			this.logger.addLog(Logger.LOG_ERROR, event.text);
+		}
+		
+		public function getServerLocation():String {
+			return this.serverLocation;
+		}
+		
+		public function getBinaryLocation():String {
+			return this.binaryLocation;
+		}
+		
+		public function getMediaServer():MediaServer {
+			return this.mediaServer;
+		}
+		
+		public function getVideos():Array {
+			return this.videos;
+		}
+		
+		public function getWallId():String {
+			return this.wallId;
+		}
+		
+		public function getRandomWallId():String {
+			return this.randomWallId;
+		}
+		
+		public function isTestSettings():Boolean {
+			return this.testSettings;
+		}
+		
+		public function getMember():Member {
+			return this.member;
+		}
+		
+		public function getUniqueFileName():String {
+			var chars:String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345679";
+			var num:int = chars.length;
+
+			var fileName:String = "";
+
+			for (var i:int = 0; i < 10; i++) {
+				fileName += chars.substr(Math.floor(Math.random() * num), 1);
+			}
+			
+			return "gk-" + fileName;
+		}
+		
+		protected function isWallIdSet():Boolean {
+			return (this.getWallId() != null) && (this.getWallId() != ""); 
+		}
+	}
+}

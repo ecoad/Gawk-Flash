@@ -1,0 +1,27 @@
+# Node.js with Express and Stlyus
+public/css/*.css
+
+# Eclipse
+/.project
+/.settings
+/.actionScriptProperties
+
+# Windows
+Thumbs.db
+
+# Vim
+.*.sw[a-z]
+*.un~i
+
+.svn/
+
+# Atrox Projects
+/Application/Bootstrap.php
+/Config/Apache/vhost.conf
+
+# OsX
+.DS_Store
+Icon?
+._*
+.Spotlight-V100
+.Trashes
