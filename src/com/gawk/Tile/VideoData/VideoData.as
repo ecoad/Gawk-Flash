@@ -1,38 +1,38 @@
 package com.gawk.Tile.VideoData {
 	public class VideoData {
 		
-		protected var id:String;
+		protected var secureId:String;
 		protected var filename:String;
-		protected var memberId:int;
+		protected var memberSecureId:String;
 		
 		public function VideoData(data:Object)	{
-			this.setId(data.secureId);
+			this.setSecureId(data.secureId);
 			this.setFilename(data.filename);
-			this.setMemberId(data.memberId);
+			this.setMemberSecureId(data.memberSecureId);
 		}
 		
-		public function setId(id:String):void {
-			this.id = id;
+		public function setSecureId(secureId:String):void {
+			this.secureId = secureId;
 		}
 		
 		public function setFilename(filename:String):void {
 			this.filename = filename;
 		}
 		
-		public function setMemberId(memberId:*):void {
-			this.memberId = parseInt(memberId);
+		public function setMemberSecureId(memberSecureId:*):void {
+			this.memberSecureId = memberSecureId;
 		}
 		
-		public function getId():String {
-			return this.id;
+		public function getSecureId():String {
+			return this.secureId;
 		}
 		
 		public function getFilename():String {
 			return this.filename;
 		}
 		
-		public function getMemberId():int {
-			return this.memberId;
+		public function getMemberSecureId():String {
+			return this.memberSecureId;
 		}
 	}
 }

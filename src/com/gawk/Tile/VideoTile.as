@@ -176,9 +176,9 @@ package com.gawk.Tile {
 		
 		protected function onVideoSaved(event:EngineEvent):void {
 			this.parentTile.getEngine().removeEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-			this.videoData.setId(event.data.videoId);
-			this.videoData.setMemberId(event.data.memberId);
-			if (this.parentTile.getEngine().getMember() !== null) {
+			this.videoData.setSecureId(event.data.videoId);
+			this.videoData.setMemberSecureId(event.data.memberSecureId);
+			if (this.parentTile.getEngine().getMemberControl().getMemberData().secureId != "") {
 				this.allowTileMemberPanelEvents();
 			}
 		}
@@ -202,7 +202,7 @@ package com.gawk.Tile {
 		protected function showMemberUIControls():void {
 			this.tileMemberPanel.getPanel().visible = true;	
 			
-			if (this.parentTile.getEngine().getMember().getId() == videoData.getMemberId()) {
+			if (this.parentTile.getEngine().getMemberControl().getMemberData().secureId == videoData.getMemberSecureId()) {
 				this.tileMemberPanel.showRemoveButton();
 			} else {
 				this.tileMemberPanel.hideRemoveButton();

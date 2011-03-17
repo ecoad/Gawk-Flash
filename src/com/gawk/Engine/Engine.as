@@ -3,7 +3,7 @@ package com.gawk.Engine {
 	import com.gawk.Logger.Logger;
 	import com.gawk.MediaServer.MediaServer;
 	import com.gawk.Member.Action.Action;
-	import com.gawk.Member.Member;
+	import com.gawk.Member.MemberControl;
 	import com.gawk.UI.TileMemberPanel.Event.TileMemberPanelEvent;
 	import com.gawk.URLLoader.CustomURLLoader;
 	import com.utils.JSON;
@@ -17,12 +17,12 @@ package com.gawk.Engine {
 	public class Engine	extends EventDispatcher {
 		
 		public var logger:Logger;
-		protected var member:Member;
+		protected var memberControl:MemberControl;
 		protected var mediaServer:MediaServer;
 		
 		protected var config:Object;
 		
-		protected var wallId:String;
+		protected var wallSecureId:String;
 		protected var serverLocation:String;
 		protected var mediaServerLocation:String;
 		protected var serviceLocation:String;
@@ -35,18 +35,18 @@ package com.gawk.Engine {
 		
 		protected var retrievingLoggedInMember:Boolean = false;
 		
-		public function Engine(serviceLocation:String, wallId:String, loggedInAtInit:Boolean, testSettings:Boolean) {
+		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, testSettings:Boolean) {
 			this.logger = new Logger(this);
-			this.member = new Member(this);
+			this.memberControl = new MemberControl(this);
 			this.mediaServer = new MediaServer(this);
 			
 			this.serviceLocation = serviceLocation;
-			this.wallId = wallId;
+			this.wallSecureId = wallSecureId;
 			this.testSettings = testSettings;
 			
 			if (loggedInAtInit) {
 				this.addEventListener(EngineEvent.WALL_CONFIG_LOADED, function (event:EngineEvent):void {
-					this.member.retrieveLoggedInMember();
+					this.memberControl.retrieveLoggedInMember();
 				});
 			}
 			
@@ -56,8 +56,8 @@ package com.gawk.Engine {
 		protected function retrieveWallConfig():void {
 			this.logger.addLog(Logger.LOG_ACTIVITY, "Retrieving Wall Config from " + this.serviceLocation);
 			var variables:URLVariables = new URLVariables();
-			if (this.isWallIdSet()) {
-				variables.WallSecureId = this.getWallId();
+			if (this.isWallSecureIdSet()) {
+				variables.WallSecureId = this.getWallSecureId();
 			} else {
 				variables.Action = "Flash.InitApplication";
 			}
@@ -97,8 +97,8 @@ package com.gawk.Engine {
 			var variables:URLVariables = new URLVariables();
 			variables.Action = "Video.SiteUpload";
 			variables.Filename = filename;
-			variables.WallId = this.getWallId();
-			variables.MemberId = this.member.getId();
+			variables.WallSecureId = this.getWallSecureId();
+			variables.MemberSecureId = this.memberControl.getMemberData().secureId;
 			
 			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
 			urlLoader.addEventListener(Event.COMPLETE, this.onSaveVideoResponse);
@@ -209,20 +209,12 @@ package com.gawk.Engine {
 			return this.videos;
 		}
 		
-		public function getWallId():String {
-			return this.wallId;
-		}
-		
-		public function getRandomWallId():String {
-			return this.randomWallId;
+		public function getWallSecureId():String {
+			return this.wallSecureId;
 		}
 		
 		public function isTestSettings():Boolean {
 			return this.testSettings;
-		}
-		
-		public function getMember():Member {
-			return this.member;
 		}
 		
 		public function getUniqueFileName():String {
@@ -238,8 +230,12 @@ package com.gawk.Engine {
 			return "gk-" + fileName;
 		}
 		
-		protected function isWallIdSet():Boolean {
-			return (this.getWallId() != null) && (this.getWallId() != ""); 
+		protected function isWallSecureIdSet():Boolean {
+			return (this.getWallSecureId() != null) && (this.getWallSecureId() != ""); 
+		}
+		
+		public function getMemberControl():MemberControl {
+			return this.memberControl;
 		}
 	}
 }

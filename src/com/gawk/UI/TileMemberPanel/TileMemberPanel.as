@@ -26,7 +26,7 @@ package com.gawk.UI.TileMemberPanel {
 		public function addButtons():void {
 			this.addFavouriteButton();
 			this.addHateButton();
-			if (this.parentTile.getVideoData().getMemberId() == this.parentTile.getParentTile().getEngine().getMember().getId()) {
+			if (this.parentTile.getVideoData().getMemberSecureId() == this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId) {
 				this.addRemoveButton();
 			}
 		}
@@ -43,8 +43,8 @@ package com.gawk.UI.TileMemberPanel {
 			
 			var action:Action = new Action({
 				action: "GawkPositiveRating", 
-				videoId: this.parentTile.getVideoData().getId(),
-				memberId: this.parentTile.getParentTile().getEngine().getMember().getId()
+				videoSecureId: this.parentTile.getVideoData().getSecureId(),
+				memberSecureId: this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId
 			});
 			
 			this.parentTile.getParentTile().getEngine().dispatchEvent(new TileMemberPanelEvent(TileMemberPanelEvent.TILE_MEMBER_PANEL_ACTION, action));
@@ -61,8 +61,8 @@ package com.gawk.UI.TileMemberPanel {
 		protected function onHateButtonClick(event:MouseEvent):void {
 			var action:Action = new Action({
 				action: "GawkNegativeRating", 
-				videoId: this.parentTile.getVideoData().getId(),
-				memberId: this.parentTile.getParentTile().getEngine().getMember().getId()
+				videoSecureId: this.parentTile.getVideoData().getSecureId(),
+				memberSecureId: this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId
 			});
 			
 			this.parentTile.getParentTile().getEngine().dispatchEvent(new TileMemberPanelEvent(TileMemberPanelEvent.TILE_MEMBER_PANEL_ACTION, action));
@@ -79,8 +79,8 @@ package com.gawk.UI.TileMemberPanel {
 		protected function onRemoveButtonClick(event:MouseEvent):void {
 			var action:Action = new Action({
 				action: "GawkRemove", 
-				videoId: this.parentTile.getVideoData().getId(),
-				memberId: this.parentTile.getParentTile().getEngine().getMember().getId()
+				videoSecureId: this.parentTile.getVideoData().getSecureId(),
+				memberSecureId: this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId
 			});
 			
 			this.parentTile.getParentTile().getEngine().dispatchEvent(new TileMemberPanelEvent(TileMemberPanelEvent.TILE_MEMBER_PANEL_ACTION, action));
