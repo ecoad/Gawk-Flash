@@ -1,5 +1,7 @@
 package com.gawk.UI.VideoTileOverlay {
+	import com.gawk.Engine.Engine;
 	import com.gawk.Graphics.VideoTileOverlay;
+	import com.gawk.Graphics.VideoTileOverlay.*;
 	import com.gawk.Tile.VideoTile;
 	import com.gawk.UI.TileButton;
 	
@@ -14,21 +16,37 @@ package com.gawk.UI.VideoTileOverlay {
 		protected var hateButton:TileButton;
 		protected var removeButton:TileButton;
 		
-		public function VideoTileOverlayController(parentTile:VideoTile)	{
+		protected var profileVideo:ProfileVideo;
+		protected var engine:Engine;
+		
+		public function VideoTileOverlayController(parentTile:VideoTile, engine:Engine)	{
 			this.parentTile = parentTile;
+			this.engine = engine;
 			this.panel = new VideoTileOverlay();
 			this.panel.visible = false;
 			
 			this.addUiEventListners();
+			this.setName(this.parentTile.getVideoData().getMember().alias);
+			this.setProfileVideo(this.parentTile.getVideoData().getMember().profileVideoLocation);
 		}
 		
-		public function addUiEventListners():void {
+		protected function addUiEventListners():void {
 			this.parentTile.addEventListener(MouseEvent.MOUSE_OVER, function (event:MouseEvent):void {
 				panel.visible = true;
+				profileVideo.loadVideo();
 			});
 			this.parentTile.addEventListener(MouseEvent.MOUSE_OUT, function (event:MouseEvent):void {
 				panel.visible = false;
 			});
+		}
+		
+		protected function setName(name:String):void {
+			this.panel.profile.aliasText.text = name;
+		}
+		
+		protected function setProfileVideo(profileVideoLocation:String):void {
+			this.profileVideo = new ProfileVideo(this, this.engine, profileVideoLocation);
+			this.panel.profile.addChild(this.profileVideo.getVideo());
 		}
 		
 		protected function onLogin():void {
@@ -138,6 +156,10 @@ package com.gawk.UI.VideoTileOverlay {
 		*/
 		public function getPanel():VideoTileOverlay {
 			return this.panel;
+		}
+		
+		public function getParentTile():VideoTile {
+			return this.parentTile;
 		}
 	}
 }

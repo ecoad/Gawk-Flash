@@ -1,14 +1,18 @@
 package com.gawk.Tile.VideoData {
+	import com.gawk.Member.Member;
+	
 	public class VideoData {
 		
 		protected var secureId:String;
 		protected var filename:String;
 		protected var memberSecureId:String;
+		protected var member:Member;
 		
 		public function VideoData(data:Object)	{
 			this.setSecureId(data.secureId);
 			this.setFilename(data.filename);
-			this.setMemberSecureId(data.memberSecureId);
+			this.setMemberSecureId(data.member);
+			this.setMember(data.member);
 		}
 		
 		public function setSecureId(secureId:String):void {
@@ -23,6 +27,10 @@ package com.gawk.Tile.VideoData {
 			this.memberSecureId = memberSecureId;
 		}
 		
+		public function setMember(memberData:Object):void {
+			this.member = new Member(memberData);
+		}
+		
 		public function getSecureId():String {
 			return this.secureId;
 		}
@@ -33,6 +41,10 @@ package com.gawk.Tile.VideoData {
 		
 		public function getMemberSecureId():String {
 			return this.memberSecureId;
+		}
+		
+		public function getMember():Member {
+			return this.member;
 		}
 	}
 }

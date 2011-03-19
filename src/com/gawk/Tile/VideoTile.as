@@ -1,26 +1,23 @@
 package com.gawk.Tile {
 	import com.gawk.Engine.Event.EngineEvent;
+	import com.gawk.Engine.Event.VideoLoaderEvent;
+	import com.gawk.Engine.VideoLoader;
 	import com.gawk.Logger.Logger;
 	import com.gawk.Tile.Event.TileEvent;
 	import com.gawk.Tile.VideoData.VideoData;
 	import com.gawk.UI.TileButton;
 	import com.gawk.UI.VideoTileOverlay.VideoTileOverlayController;
 	
-	import flash.display.Loader;
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
-	import flash.events.NetStatusEvent;
-	import flash.media.SoundTransform;
 	import flash.media.Video;
-	import flash.net.NetConnection;
-	import flash.net.NetStream;
 	
 	public class VideoTile extends MovieClip {
 		protected var parentTile:Tile;
 		protected var videoData:VideoData;
 		
-		protected var loader:Loader;
-		protected var netStream:NetStream;
+		protected var videoLoader:VideoLoader;
+		
 		protected var video:Video;
 		
 		protected var newlySubmitted:Boolean;
@@ -32,8 +29,10 @@ package com.gawk.Tile {
 		
 		public function VideoTile(parentTile:Tile, videoData:VideoData, newlySubmitted:Boolean = false) {
 			this.parentTile = parentTile;
-			this.setVideoData(videoData.getMember());
+			this.setVideoData(videoData);
 			this.newlySubmitted = newlySubmitted;
+			
+			this.videoLoader = new VideoLoader(this.parentTile.getEngine());
 		}
 		
 		public function loadVideo():void {
@@ -56,40 +55,29 @@ package com.gawk.Tile {
 		}
 		
 		protected function initialiseLoadVideo():void {
-			//TODO: Can we share this net connection?
-			var netConnection:NetConnection = new NetConnection(); 
-			netConnection.connect(null); 
-			
-			this.netStream = new NetStream(netConnection);
-			this.netStream.soundTransform = new SoundTransform(0);
-			this.netStream.addEventListener(NetStatusEvent.NET_STATUS, this.onNetStatus);
-			this.netStream.bufferTime = 1;
-			var infoClient:Object = new Object();
-			infoClient.onMetaData = function():void {}; // Container for video MetaData
-			this.netStream.client = infoClient;
-			
 			this.video = new Video();
 			this.addChild(this.video);
 		}
 		
 		protected function playVideo():void {
-			this.video.attachNetStream(this.netStream); 
+			this.video.attachNetStream(this.videoLoader.getNetStream());
+			this.videoLoader.addEventListener(VideoLoaderEvent.VIDEO_LOADED, this.onVideoLoaded); 
 			
 			var fullVideoLocation:String = this.parentTile.getEngine().getBinaryLocation() + this.videoData.getFilename(); 
 			
-			this.netStream.play(fullVideoLocation);
+			this.videoLoader.getNetStream().play(fullVideoLocation);
 			this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "Loading video: " + fullVideoLocation);
 		}
 		
 		public function pauseVideo():void {
-			if (this.netStream !== null) {
-				this.netStream.pause();
+			if (this.videoLoader.getNetStream() !== null) {
+				this.videoLoader.getNetStream().pause();
 			}
 		}
 		
 		public function resumeVideo():void {
-			if (this.netStream !== null) {
-				this.netStream.resume();
+			if (this.videoLoader.getNetStream() !== null) {
+				this.videoLoader.getNetStream().resume();
 			}
 		}
 		/*
@@ -114,7 +102,7 @@ package com.gawk.Tile {
 		*/
 		
 		protected function addVideoTileOverlay():void {
-			this.videoTileOverlayController = new VideoTileOverlayController(this);
+			this.videoTileOverlayController = new VideoTileOverlayController(this, this.parentTile.getEngine());
 			this.addChild(this.videoTileOverlayController.getPanel());
 		}
 		
@@ -140,24 +128,7 @@ package com.gawk.Tile {
 		}
 		*/
 		
-		protected function onNetStatus(event:NetStatusEvent):void {
-			switch (event.info.code) {
-				case "NetStream.Play.Start":
-					this.onVideoLoaded();
-					break;
-				case "NetStream.Play.Stop":
-					netStream.seek(0); // Loop video playback
-					break;
-				case "NetStream.Play.StreamNotFound":
-					this.parentTile.getEngine().logger.addLog(Logger.LOG_ERROR, this.videoData.getFilename() + ": NetStream.Play.StreamNotFound");
-					this.onVideoLoaded();
-					break;					
-				default:
-					//this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, this.videoLocation + ": " + event.info.code); 
-			}
-		}
-		
-		protected function onVideoLoaded():void {
+		protected function onVideoLoaded(event:VideoLoaderEvent):void {
 			this.video.width = Tile.tileWidth;
 			this.video.height = Tile.tileHeight;
 			

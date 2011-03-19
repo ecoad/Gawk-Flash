@@ -8,6 +8,8 @@ package com.gawk.Member {
 		public var facebookId:int = 0;
 		public var emailAddress:String = "";
 		public var token:String = "";
+		public var profileVideoSecureId:String = "";
+		public var profileVideoLocation:String = "";
 		
 		public function Member(memberData:Object = null) {
 			if (memberData) {
@@ -38,6 +40,14 @@ package com.gawk.Member {
 			
 			if (memberData.facebookId) {
 				this.facebookId = memberData.facebookId;
+			}
+			
+			if (memberData.profileVideoSecureId) {
+				this.profileVideoSecureId = memberData.profileVideoSecureId;
+			}
+			
+			if (memberData.profileVideoLocation) {
+				this.profileVideoLocation = memberData.profileVideoLocation;
 			}
 		}
 	}
