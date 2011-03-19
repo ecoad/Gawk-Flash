@@ -42,7 +42,7 @@ package com.gawk.MediaServer {
 			netConnection.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
 			netConnection.connect(engine.getServerLocation());
 			
-			dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTING));
+			this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTING));
 		}
 		
 		/**
@@ -51,13 +51,18 @@ package com.gawk.MediaServer {
 		protected function onNetConnectionStatus(infoObject:NetStatusEvent):void {
 			
 			this.engine.logger.addLog(Logger.LOG_ACTIVITY, infoObject.info.code+" ("+infoObject.info.description+")");
-			if (infoObject.info.code == "NetConnection.Connect.Failed") {
-				this.engine.logger.addLog(Logger.LOG_ERROR, "Cannot connect to Media Server: " + engine.getServerLocation()); 
-			} else if (infoObject.info.code == "NetConnection.Connect.Success") {
-				this.engine.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTED));
-				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connected to Media Server");
-			} else if (infoObject.info.code == "NetConnection.Connect.Rejected") {
-				this.engine.logger.addLog(Logger.LOG_ERROR, "NetConnection.Connect.Rejected");
+			switch (infoObject.info.code) {
+				case "NetConnection.Connect.Success":
+					this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connected to Media Server");
+					this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTED));
+					this.connected = true;
+					break;
+				case "NetConnection.Connect.Failed":
+					this.engine.logger.addLog(Logger.LOG_ERROR, "Cannot connect to Media Server: " + engine.getServerLocation()); 
+					break;
+				case "NetConnection.Connect.Rejected":
+					this.engine.logger.addLog(Logger.LOG_ERROR, "NetConnection.Connect.Rejected");
+					break;
 			}
 		}
 		
@@ -103,7 +108,7 @@ package com.gawk.MediaServer {
 				currentVideoLength++;
 			}
 			
-			dispatchEvent(new MediaServerEvent(MediaServerEvent.TIME_REMAINING_TICK, currentVideoLength));
+			this.dispatchEvent(new MediaServerEvent(MediaServerEvent.TIME_REMAINING_TICK, currentVideoLength));
 		}
 		
 		public function stopPublishing():void	{
@@ -114,7 +119,7 @@ package com.gawk.MediaServer {
 			nsPublish.attachCamera(null);
 			
 			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Publishing stopped");
-			dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_STOPPED));
+			this.dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_STOPPED));
 		
 			// After stopping the publishing we need to check if there is
 			// video content in the NetStream buffer. If there is data
@@ -124,7 +129,7 @@ package com.gawk.MediaServer {
 			var buffLen:Number = nsPublish.bufferLength;
 			if (buffLen > 0) {
 				flushVideoBufferTimer = setInterval(flushVideoBuffer, 250);
-				dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_WAIT_FOR_BUFFER));
+				this.dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_WAIT_FOR_BUFFER));
 			}	else {
 				//TODO: not sure if this is needed
 				closePublished();
@@ -147,7 +152,7 @@ package com.gawk.MediaServer {
 		protected function flushVideoBuffer():void	{
 			var buffLen:Number = nsPublish.bufferLength;
 			if (buffLen == 0)	{
-				dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_STOPPED));
+				this.dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_STOPPED));
 				clearInterval(flushVideoBufferTimer);
 				flushVideoBufferTimer = 0;
 				closePublished();
@@ -162,12 +167,16 @@ package com.gawk.MediaServer {
 			// tells us all the video and audio data has been written to the flv file. It is at this time
 			// that we can start playing the video we just recorded.
 			if (infoObject.info.code == "NetStream.Unpublish.Success") {
-				this.engine.dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_COMPLETE, this.currentFileName + ".flv"));
+				this.dispatchEvent(new MediaServerEvent(MediaServerEvent.PUBLISHING_COMPLETE, this.currentFileName + ".flv"));
 			}
 		
 			if (infoObject.info.code == "NetStream.Play.StreamNotFound" || infoObject.info.code == "NetStream.Play.Failed") {
 				this.engine.logger.addLog(Logger.LOG_ERROR, "NS Publish: " + infoObject.info.code);
 			}
+		}
+		
+		public function isConnected():Boolean {
+			return this.connected;
 		}
 	}
 }

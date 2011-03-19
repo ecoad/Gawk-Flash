@@ -1,6 +1,7 @@
 package com.gawk.Wall {
 	import com.gawk.Engine.Engine;
 	import com.gawk.Engine.Event.EngineEvent;
+	import com.gawk.Graphics.VideoTileOverlay;
 	import com.gawk.MediaServer.Event.MediaServerEvent;
 	import com.gawk.Tile.CameraTile;
 	import com.gawk.Tile.Event.TileEvent;
@@ -8,7 +9,6 @@ package com.gawk.Wall {
 	import com.gawk.Tile.VideoData.VideoData;
 	import com.gawk.Tile.VideoTile;
 	import com.gawk.UI.Main.Shroud;
-	import com.gawk.UI.TileMemberPanel.Event.TileMemberPanelEvent;
 	
 	import flash.display.MovieClip;
 	import flash.external.ExternalInterface;
@@ -33,13 +33,18 @@ package com.gawk.Wall {
 		
 		public function Wall(engine:Engine) {
 			this.engine = engine;
-			this.engine.addEventListener(MediaServerEvent.CONNECTED, this.onMediaServerConnected);
+			if (!this.engine.getMediaServer().isConnected()) {
+				this.engine.getMediaServer().addEventListener(MediaServerEvent.CONNECTED, this.onMediaServerConnected);
+			} else {
+				this.onMediaServerConnected();
+			}
+
 			this.engine.addEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-			
+
 			this.cameraTile = new CameraTile();
 			this.engine.addEventListener(TileEvent.CAMERA_CANCELLED, this.onCameraCancelled);
 			this.engine.addEventListener(TileEvent.CAMERA_ADDED, this.onCameraAdded);
-			
+
 			this.createWall();
 			this.addShroud();
 		}
@@ -75,11 +80,10 @@ package com.gawk.Wall {
 			while (this.tilePositions.length > 0) {
 				var index:int = Math.round(Math.random() * (this.tilePositions.length - 1));
 				var tilePosition:Array = this.tilePositions.splice(index, 1)[0];
-					
+
 				var tile:Tile = new Tile(this.engine, this,	videos[tileIndex] ? new VideoData(videos[tileIndex]) : null);
 				
 				this.engine.addEventListener(TileEvent.TILE_LOADED, onVideoLoaded);
-				this.engine.addEventListener(TileMemberPanelEvent.TILE_MEMBER_PANEL_ACTION, this.engine.onMemberPanelAction);
 				tile.movieClip.x = tilePosition[0];
 				tile.movieClip.y = tilePosition[1];
 				
@@ -89,8 +93,9 @@ package com.gawk.Wall {
 				this.waitingTiles.push(tile);
 				
 				tileIndex++;
-			}			
+			}
 		}
+		
 		
 		protected function onVideoLoaded(event:TileEvent):void {
 			this.loadNextWaitingTile();
@@ -168,7 +173,7 @@ package com.gawk.Wall {
 			this.toggleWallPause(false);
 		}
 		
-		protected function onMediaServerConnected(event:MediaServerEvent):void {
+		protected function onMediaServerConnected(event:MediaServerEvent = null):void {
 			ExternalInterface.addCallback("recordNewFromExternal", this.onRecordNewButtonClick);
 		}
 		

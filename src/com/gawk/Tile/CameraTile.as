@@ -27,8 +27,8 @@ package com.gawk.Tile {
 				this.loadCamera();
 				this.removePublishingEventListeners();
 				
-				this.parentTile.getEngine().addEventListener(MediaServerEvent.PUBLISHING_COMPLETE, this.onPublishingComplete);
-				this.parentTile.getEngine().addEventListener(MediaServerEvent.PUBLISHING_STOPPED, this.onPublishingStopped);
+				this.parentTile.getEngine().getMediaServer().addEventListener(MediaServerEvent.PUBLISHING_COMPLETE, this.onPublishingComplete);
+				this.parentTile.getEngine().getMediaServer().addEventListener(MediaServerEvent.PUBLISHING_STOPPED, this.onPublishingStopped);
 			}
 			this.recordButton.setLabelText("Record");
 			this.video.visible = true;

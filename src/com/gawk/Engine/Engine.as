@@ -1,10 +1,11 @@
 package com.gawk.Engine {
 	import com.gawk.Engine.Event.EngineEvent;
 	import com.gawk.Logger.Logger;
+	import com.gawk.MediaServer.Event.MediaServerEvent;
 	import com.gawk.MediaServer.MediaServer;
 	import com.gawk.Member.Action.Action;
 	import com.gawk.Member.MemberControl;
-	import com.gawk.UI.TileMemberPanel.Event.TileMemberPanelEvent;
+	import com.gawk.UI.VideoTileOverlay.Event.VideoTileOverlayEvent;
 	import com.gawk.URLLoader.CustomURLLoader;
 	import com.utils.JSON;
 	
@@ -37,8 +38,8 @@ package com.gawk.Engine {
 		
 		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, testSettings:Boolean) {
 			this.logger = new Logger(this);
-			this.memberControl = new MemberControl(this);
 			this.mediaServer = new MediaServer(this);
+			this.memberControl = new MemberControl(this);
 			
 			this.serviceLocation = serviceLocation;
 			this.wallSecureId = wallSecureId;
@@ -124,7 +125,8 @@ package com.gawk.Engine {
 			}
 		}
 		
-		public function onMemberPanelAction(event:TileMemberPanelEvent):void {
+		/*
+		public function onMemberPanelAction(event:VideoTileOverlayEvent):void {
 			var action:Action = event.action;
 			
 			var variables:URLVariables = new URLVariables();
@@ -154,6 +156,7 @@ package com.gawk.Engine {
 				this.logger.addLog(Logger.LOG_ERROR, "Member Panel Action response: " + event.target.data); 
 			}
 		}
+		*/
 		
 		public function getLoggedInMember():void {
 			if (!retrievingLoggedInMember) {

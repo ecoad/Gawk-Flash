@@ -51,7 +51,7 @@ package com.gawk.Tile {
 			cameraTile.setParentTile(this);
 			
 			this.movieClip.addChild(cameraTile);
-			this.engine.addEventListener(MediaServerEvent.PUBLISHING_COMPLETE, this.onPublishingComplete);
+			this.engine.getMediaServer().addEventListener(MediaServerEvent.PUBLISHING_COMPLETE, this.onPublishingComplete);
 			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Camera tile created");
 			
 			if (autoRecord) {

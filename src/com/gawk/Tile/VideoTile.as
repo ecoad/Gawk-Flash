@@ -1,15 +1,13 @@
 package com.gawk.Tile {
 	import com.gawk.Engine.Event.EngineEvent;
 	import com.gawk.Logger.Logger;
-	import com.gawk.Member.Event.MemberEvent;
 	import com.gawk.Tile.Event.TileEvent;
 	import com.gawk.Tile.VideoData.VideoData;
 	import com.gawk.UI.TileButton;
-	import com.gawk.UI.TileMemberPanel.TileMemberPanel;
+	import com.gawk.UI.VideoTileOverlay.VideoTileOverlayController;
 	
 	import flash.display.Loader;
 	import flash.display.MovieClip;
-	import flash.events.IOErrorEvent;
 	import flash.events.MouseEvent;
 	import flash.events.NetStatusEvent;
 	import flash.media.SoundTransform;
@@ -30,29 +28,29 @@ package com.gawk.Tile {
 		protected var reRecordButton:TileButton;
 		protected var saveButton:TileButton;
 		
-		protected var tileMemberPanel:TileMemberPanel;
+		protected var videoTileOverlayController:VideoTileOverlayController;
 		
 		public function VideoTile(parentTile:Tile, videoData:VideoData, newlySubmitted:Boolean = false) {
 			this.parentTile = parentTile;
-			this.videoData = videoData;
+			this.setVideoData(videoData.getMember());
 			this.newlySubmitted = newlySubmitted;
 		}
 		
 		public function loadVideo():void {
 			this.initialiseLoadVideo();
 			
-			this.addMemberUIControls();
+			this.addVideoTileOverlay();
 			
-			if (this.newlySubmitted) {
-				this.addRecordUI();
-			}
+//			if (this.newlySubmitted) {
+//				this.addRecordUI();
+//			}
 			
-			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_IN, function (event:MemberEvent):void {
-				allowTileMemberPanelEvents();
-			});
-			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_OUT, function (event:MemberEvent):void {
-				disallowTileMemberPanelEvents();
-			});
+//			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_IN, function (event:MemberEvent):void {
+//				allowVideoTileOverlayEvents();
+//			});
+//			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_OUT, function (event:MemberEvent):void {
+//				disallowVideoTileOverlayEvents();
+//			});
 			
 			this.playVideo();
 		}
@@ -94,7 +92,7 @@ package com.gawk.Tile {
 				this.netStream.resume();
 			}
 		}
-		
+		/*
 		protected function addRecordUI():void {
 			if (this.reRecordButton === null) {
 				this.addReRecordButton();
@@ -113,13 +111,14 @@ package com.gawk.Tile {
 			this.reRecordButton.visible = false;
 			this.saveButton.visible = false;
 		}
+		*/
 		
-		protected function addMemberUIControls():void {
-			this.tileMemberPanel = new TileMemberPanel(this);
-			this.addChild(this.tileMemberPanel.getPanel());
-			this.tileMemberPanel.getPanel().visible = false;
+		protected function addVideoTileOverlay():void {
+			this.videoTileOverlayController = new VideoTileOverlayController(this);
+			this.addChild(this.videoTileOverlayController.getPanel());
 		}
 		
+		/*
 		protected function addReRecordButton():void {
 			this.reRecordButton = new TileButton(90, 20, "Re-Record", -1);
 			this.reRecordButton.y = Tile.getHeight() + 5;
@@ -139,6 +138,7 @@ package com.gawk.Tile {
 			
 			this.addChild(this.saveButton);
 		}
+		*/
 		
 		protected function onNetStatus(event:NetStatusEvent):void {
 			switch (event.info.code) {
@@ -171,16 +171,20 @@ package com.gawk.Tile {
 		protected function onSaveButtonClick(event:MouseEvent):void {
 			this.parentTile.getEngine().saveVideo(this.videoData.getFilename());
 			this.parentTile.getEngine().addEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-			this.hideRecordControls();
+//			this.hideRecordControls();
 		}
 		
 		protected function onVideoSaved(event:EngineEvent):void {
 			this.parentTile.getEngine().removeEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
 			this.videoData.setSecureId(event.data.videoId);
 			this.videoData.setMemberSecureId(event.data.memberSecureId);
-			if (this.parentTile.getEngine().getMemberControl().getMemberData().secureId != "") {
-				this.allowTileMemberPanelEvents();
-			}
+//			if (this.parentTile.getEngine().getMemberControl().getMemberData().secureId != "") {
+//				this.allowVideoTileOverlayEvents();
+//			}
+		}
+		
+		public function setVideoData(videoData:VideoData):void {
+			this.videoData = videoData;
 		}
 		
 		public function getVideoData():VideoData {
@@ -188,37 +192,27 @@ package com.gawk.Tile {
 		}
 		
 		protected function onMouseRollOver(event:MouseEvent):void {
-			this.tileMemberPanel.getPanel().visible = true;
+			this.videoTileOverlayController.getPanel().visible = true;
 		}
 		
 		protected function onMouseRollOut(event:MouseEvent):void {
-			this.tileMemberPanel.getPanel().visible = false;
+			this.videoTileOverlayController.getPanel().visible = false;
 		}
 		
 		public function getParentTile():Tile {
 			return this.parentTile;
 		}
 		
+		/*
 		protected function showMemberUIControls():void {
-			this.tileMemberPanel.getPanel().visible = true;	
+			this.videoTileOverlayController.getPanel().visible = true;	
 			
 			if (this.parentTile.getEngine().getMemberControl().getMemberData().secureId == videoData.getMemberSecureId()) {
-				this.tileMemberPanel.showRemoveButton();
+				this.videoTileOverlayController.showRemoveButton();
 			} else {
-				this.tileMemberPanel.hideRemoveButton();
+				this.videoTileOverlayController.hideRemoveButton();
 			}
 		}
-		
-		public function allowTileMemberPanelEvents():void {
-			this.disallowTileMemberPanelEvents(); //Remove all events first to prevent duplication
-			
-			this.addEventListener(MouseEvent.MOUSE_OVER, onMouseRollOver);
-			this.addEventListener(MouseEvent.MOUSE_OUT, onMouseRollOut);		
-		}
-		
-		public function disallowTileMemberPanelEvents():void {
-			this.removeEventListener(MouseEvent.MOUSE_OVER, onMouseRollOver);
-			this.removeEventListener(MouseEvent.MOUSE_OUT, onMouseRollOut);	
-		}
+		*/
 	}
 }
