@@ -1,12 +1,10 @@
 package com.gawk.Engine {
 	import com.gawk.Engine.Event.EngineEvent;
 	import com.gawk.Logger.Logger;
-	import com.gawk.MediaServer.Event.MediaServerEvent;
 	import com.gawk.MediaServer.MediaServer;
-	import com.gawk.Member.Action.Action;
 	import com.gawk.Member.MemberControl;
-	import com.gawk.UI.VideoTileOverlay.Event.VideoTileOverlayEvent;
 	import com.gawk.URLLoader.CustomURLLoader;
+	import com.gawk.Video.VideoObject;
 	import com.utils.JSON;
 	
 	import flash.events.Event;
@@ -24,7 +22,6 @@ package com.gawk.Engine {
 		protected var config:Object;
 		
 		protected var wallSecureId:String;
-		protected var serverLocation:String;
 		protected var mediaServerLocation:String;
 		protected var serviceLocation:String;
 		protected var binaryLocation:String;
@@ -95,11 +92,19 @@ package com.gawk.Engine {
 		}
 		
 		public function saveVideo(filename:String):void {
+			var video:VideoObject = new VideoObject();
+			video.filename = filename;
+			video.wallSecureId = this.getWallSecureId();
+			video.uploadSource = "flash";
+			video.hash = "unknown";
+			video.memberSecureId = this.getMemberControl().getMemberData().secureId;
+			
 			var variables:URLVariables = new URLVariables();
-			variables.Action = "Video.SiteUpload";
-			variables.Filename = filename;
-			variables.WallSecureId = this.getWallSecureId();
-			variables.MemberSecureId = this.memberControl.getMemberData().secureId;
+			variables.Action = "Video.Save";
+			variables.Video = JSON.serialize(video.toObject());
+			variables.Token = this.memberControl.getMemberData().token;
+			
+			this.logger.addLog(Logger.LOG_ACTIVITY, "Saving video: " + variables.Video);
 			
 			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
 			urlLoader.addEventListener(Event.COMPLETE, this.onSaveVideoResponse);
@@ -196,8 +201,8 @@ package com.gawk.Engine {
 			this.logger.addLog(Logger.LOG_ERROR, event.text);
 		}
 		
-		public function getServerLocation():String {
-			return this.serverLocation;
+		public function getMediaServerLocation():String {
+			return this.mediaServerLocation;
 		}
 		
 		public function getBinaryLocation():String {

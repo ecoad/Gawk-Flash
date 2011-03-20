@@ -26,8 +26,8 @@ package com.gawk.UI.VideoTileOverlay {
 			this.panel.visible = false;
 			
 			this.addUiEventListners();
-			this.setName(this.parentTile.getVideoData().getMember().alias);
-			this.setProfileVideo(this.parentTile.getVideoData().getMember().profileVideoLocation);
+			this.setName(this.parentTile.getVideoObject().member.alias);
+			this.setProfileVideo(this.parentTile.getVideoObject().member.profileVideoLocation);
 		}
 		
 		protected function addUiEventListners():void {

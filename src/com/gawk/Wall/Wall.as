@@ -1,14 +1,14 @@
 package com.gawk.Wall {
 	import com.gawk.Engine.Engine;
 	import com.gawk.Engine.Event.EngineEvent;
-	import com.gawk.Graphics.VideoTileOverlay;
+	import com.gawk.Logger.Logger;
 	import com.gawk.MediaServer.Event.MediaServerEvent;
 	import com.gawk.Tile.CameraTile;
 	import com.gawk.Tile.Event.TileEvent;
 	import com.gawk.Tile.Tile;
-	import com.gawk.Tile.VideoData.VideoData;
 	import com.gawk.Tile.VideoTile;
 	import com.gawk.UI.Main.Shroud;
+	import com.gawk.Video.VideoObject;
 	
 	import flash.display.MovieClip;
 	import flash.external.ExternalInterface;
@@ -81,7 +81,7 @@ package com.gawk.Wall {
 				var index:int = Math.round(Math.random() * (this.tilePositions.length - 1));
 				var tilePosition:Array = this.tilePositions.splice(index, 1)[0];
 
-				var tile:Tile = new Tile(this.engine, this,	videos[tileIndex] ? new VideoData(videos[tileIndex]) : null);
+				var tile:Tile = new Tile(this.engine, this,	videos[tileIndex] ? new VideoObject(videos[tileIndex]) : null);
 				
 				this.engine.addEventListener(TileEvent.TILE_LOADED, onVideoLoaded);
 				tile.movieClip.x = tilePosition[0];
@@ -110,8 +110,12 @@ package com.gawk.Wall {
 		}
 		
 		protected function onRecordNewButtonClick():void {
-			if (!this.getCameraTile().isMuted()) {
-				this.addCameraToTile(this.getWaitingTile());
+			if (this.engine.getMediaServer().isConnected()) {
+				if (!this.getCameraTile().isMuted()) {
+					this.addCameraToTile(this.getWaitingTile());
+				}
+			} else {
+				this.engine.logger.addLog(Logger.LOG_ERROR, "Trying to record without Media Server connection");
 			}
 		}
 		

@@ -38,9 +38,10 @@ package com.gawk.MediaServer {
 		}
 		
 		public function connectToMediaServer():void {
+			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connecting to Media Server... " + engine.getMediaServerLocation());
 			netConnection = new NetConnection();
 			netConnection.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
-			netConnection.connect(engine.getServerLocation());
+			netConnection.connect(engine.getMediaServerLocation());
 			
 			this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTING));
 		}
@@ -49,16 +50,15 @@ package com.gawk.MediaServer {
 		 * On NetConnection status
 		 */
 		protected function onNetConnectionStatus(infoObject:NetStatusEvent):void {
-			
 			this.engine.logger.addLog(Logger.LOG_ACTIVITY, infoObject.info.code+" ("+infoObject.info.description+")");
 			switch (infoObject.info.code) {
 				case "NetConnection.Connect.Success":
-					this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connected to Media Server");
+					this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connected to Media Server: " + engine.getMediaServerLocation());
 					this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTED));
 					this.connected = true;
 					break;
 				case "NetConnection.Connect.Failed":
-					this.engine.logger.addLog(Logger.LOG_ERROR, "Cannot connect to Media Server: " + engine.getServerLocation()); 
+					this.engine.logger.addLog(Logger.LOG_ERROR, "Cannot connect to Media Server: " + engine.getMediaServerLocation()); 
 					break;
 				case "NetConnection.Connect.Rejected":
 					this.engine.logger.addLog(Logger.LOG_ERROR, "NetConnection.Connect.Rejected");

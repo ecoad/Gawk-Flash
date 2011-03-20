@@ -49,6 +49,25 @@ package com.gawk.Member {
 			if (memberData.profileVideoLocation) {
 				this.profileVideoLocation = memberData.profileVideoLocation;
 			}
+			
+			if (memberData.token) {
+				this.token = memberData.token;
+			}
+		}
+		
+		public function toObject():Object {
+			var object:Object = new Object;
+			object.alias = this.alias;
+			object.emailAddress = this.emailAddress;
+			object.facebookId = this.facebookId;
+			object.firstName = this.firstName;
+			object.lastName = this.lastName;
+			object.profileVideoLocation = this.profileVideoLocation;
+			object.profileVideoSecureId = this.profileVideoSecureId;
+			object.secureId = this.secureId;
+			object.token = this.token;
+			
+			return object;
 		}
 	}
 }

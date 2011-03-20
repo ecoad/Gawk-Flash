@@ -3,7 +3,7 @@ package com.gawk.Tile {
 	import com.gawk.Logger.Logger;
 	import com.gawk.MediaServer.Event.MediaServerEvent;
 	import com.gawk.Tile.Event.TileEvent;
-	import com.gawk.Tile.VideoData.VideoData;
+	import com.gawk.Video.VideoObject;
 	import com.gawk.Wall.Wall;
 	
 	import flash.display.MovieClip;
@@ -21,22 +21,22 @@ package com.gawk.Tile {
 		protected var engine:Engine;
 		protected var wall:Wall;
 		
-		public function Tile(engine:Engine, wall:Wall, videoData:VideoData = null) {
+		public function Tile(engine:Engine, wall:Wall, videoObject:VideoObject = null) {
 			this.engine = engine;
 			this.wall = wall;
 			
 			this.createTile();
 			
-			if (videoData !== null) {
-				this.createVideoTile(videoData);
+			if (videoObject !== null) {
+				this.createVideoTile(videoObject);
 			}
 		}
 		
-		public function createVideoTile(videoData:VideoData = null, newlySubmitted:Boolean = false):void {
+		public function createVideoTile(videoObject:VideoObject = null, newlySubmitted:Boolean = false):void {
 			this.removeChildren();
 			
-			if (videoData !== null) {
-				this.videoTile = new VideoTile(this, videoData, newlySubmitted);
+			if (videoObject !== null) {
+				this.videoTile = new VideoTile(this, videoObject, newlySubmitted);
 			}
 			
 			if (this.videoTile !== null) {
@@ -111,7 +111,7 @@ package com.gawk.Tile {
 				this.movieClip.removeChild(this.wall.getCameraTile());
 			} catch (error:Error) {
 			}
-			this.createVideoTile(new VideoData({id: null, filename: event.data}), true);
+			this.createVideoTile(new VideoObject({filename: event.data}), true);
 			this.videoTile.loadVideo();
 			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Load recorded video");
 		}

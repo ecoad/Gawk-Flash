@@ -2,6 +2,7 @@ package {
 	import com.gawk.Engine.Engine;
 	import com.gawk.Engine.Event.EngineEvent;
 	import com.gawk.UI.Main.*;
+	import com.gawk.Video.VideoObject;
 	import com.gawk.Wall.Wall;
 	
 	import flash.display.Sprite;

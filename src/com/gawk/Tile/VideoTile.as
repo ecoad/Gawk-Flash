@@ -4,9 +4,9 @@ package com.gawk.Tile {
 	import com.gawk.Engine.VideoLoader;
 	import com.gawk.Logger.Logger;
 	import com.gawk.Tile.Event.TileEvent;
-	import com.gawk.Tile.VideoData.VideoData;
 	import com.gawk.UI.TileButton;
 	import com.gawk.UI.VideoTileOverlay.VideoTileOverlayController;
+	import com.gawk.Video.VideoObject;
 	
 	import flash.display.MovieClip;
 	import flash.events.MouseEvent;
@@ -14,7 +14,7 @@ package com.gawk.Tile {
 	
 	public class VideoTile extends MovieClip {
 		protected var parentTile:Tile;
-		protected var videoData:VideoData;
+		protected var videoObject:VideoObject;
 		
 		protected var videoLoader:VideoLoader;
 		
@@ -27,43 +27,32 @@ package com.gawk.Tile {
 		
 		protected var videoTileOverlayController:VideoTileOverlayController;
 		
-		public function VideoTile(parentTile:Tile, videoData:VideoData, newlySubmitted:Boolean = false) {
+		public function VideoTile(parentTile:Tile, videoObject:VideoObject, newlySubmitted:Boolean = false) {
 			this.parentTile = parentTile;
-			this.setVideoData(videoData);
+			this.setVideoObject(videoObject);
 			this.newlySubmitted = newlySubmitted;
 			
 			this.videoLoader = new VideoLoader(this.parentTile.getEngine());
 		}
 		
 		public function loadVideo():void {
-			this.initialiseLoadVideo();
+			this.video = new Video();
+			this.addChild(this.video);
 			
 			this.addVideoTileOverlay();
 			
-//			if (this.newlySubmitted) {
-//				this.addRecordUI();
-//			}
-			
-//			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_IN, function (event:MemberEvent):void {
-//				allowVideoTileOverlayEvents();
-//			});
-//			this.parentTile.getEngine().addEventListener(MemberEvent.MEMBER_LOGGED_OUT, function (event:MemberEvent):void {
-//				disallowVideoTileOverlayEvents();
-//			});
+			if (this.newlySubmitted) {
+				this.addRecordUI();
+			}
 			
 			this.playVideo();
-		}
-		
-		protected function initialiseLoadVideo():void {
-			this.video = new Video();
-			this.addChild(this.video);
 		}
 		
 		protected function playVideo():void {
 			this.video.attachNetStream(this.videoLoader.getNetStream());
 			this.videoLoader.addEventListener(VideoLoaderEvent.VIDEO_LOADED, this.onVideoLoaded); 
 			
-			var fullVideoLocation:String = this.parentTile.getEngine().getBinaryLocation() + this.videoData.getFilename(); 
+			var fullVideoLocation:String = this.parentTile.getEngine().getBinaryLocation() + this.videoObject.filename; 
 			
 			this.videoLoader.getNetStream().play(fullVideoLocation);
 			this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "Loading video: " + fullVideoLocation);
@@ -80,7 +69,7 @@ package com.gawk.Tile {
 				this.videoLoader.getNetStream().resume();
 			}
 		}
-		/*
+
 		protected function addRecordUI():void {
 			if (this.reRecordButton === null) {
 				this.addReRecordButton();
@@ -99,14 +88,12 @@ package com.gawk.Tile {
 			this.reRecordButton.visible = false;
 			this.saveButton.visible = false;
 		}
-		*/
 		
 		protected function addVideoTileOverlay():void {
 			this.videoTileOverlayController = new VideoTileOverlayController(this, this.parentTile.getEngine());
 			this.addChild(this.videoTileOverlayController.getPanel());
 		}
 		
-		/*
 		protected function addReRecordButton():void {
 			this.reRecordButton = new TileButton(90, 20, "Re-Record", -1);
 			this.reRecordButton.y = Tile.getHeight() + 5;
@@ -126,7 +113,6 @@ package com.gawk.Tile {
 			
 			this.addChild(this.saveButton);
 		}
-		*/
 		
 		protected function onVideoLoaded(event:VideoLoaderEvent):void {
 			this.video.width = Tile.tileWidth;
@@ -140,26 +126,23 @@ package com.gawk.Tile {
 		}
 		
 		protected function onSaveButtonClick(event:MouseEvent):void {
-			this.parentTile.getEngine().saveVideo(this.videoData.getFilename());
+			this.parentTile.getEngine().saveVideo(this.videoObject.filename);
 			this.parentTile.getEngine().addEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-//			this.hideRecordControls();
+			this.hideRecordControls();
 		}
 		
 		protected function onVideoSaved(event:EngineEvent):void {
 			this.parentTile.getEngine().removeEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-			this.videoData.setSecureId(event.data.videoId);
-			this.videoData.setMemberSecureId(event.data.memberSecureId);
-//			if (this.parentTile.getEngine().getMemberControl().getMemberData().secureId != "") {
-//				this.allowVideoTileOverlayEvents();
-//			}
+			this.videoObject.secureId = event.data.videoId;
+			this.videoObject.memberSecureId = event.data.memberSecureId;
 		}
 		
-		public function setVideoData(videoData:VideoData):void {
-			this.videoData = videoData;
+		public function setVideoObject(videoObject:VideoObject):void {
+			this.videoObject = videoObject;
 		}
 		
-		public function getVideoData():VideoData {
-			return this.videoData;
+		public function getVideoObject():VideoObject {
+			return this.videoObject;
 		}
 		
 		protected function onMouseRollOver(event:MouseEvent):void {
@@ -173,17 +156,5 @@ package com.gawk.Tile {
 		public function getParentTile():Tile {
 			return this.parentTile;
 		}
-		
-		/*
-		protected function showMemberUIControls():void {
-			this.videoTileOverlayController.getPanel().visible = true;	
-			
-			if (this.parentTile.getEngine().getMemberControl().getMemberData().secureId == videoData.getMemberSecureId()) {
-				this.videoTileOverlayController.showRemoveButton();
-			} else {
-				this.videoTileOverlayController.hideRemoveButton();
-			}
-		}
-		*/
 	}
 }
