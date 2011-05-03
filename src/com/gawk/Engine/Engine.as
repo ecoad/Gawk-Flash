@@ -56,9 +56,8 @@ package com.gawk.Engine {
 			var variables:URLVariables = new URLVariables();
 			if (this.isWallSecureIdSet()) {
 				variables.WallSecureId = this.getWallSecureId();
-			} else {
-				variables.Action = "Flash.InitApplication";
 			}
+			variables.Action = "Flash.InitApplication";
 			
 			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
 			urlLoader.addEventListener(Event.COMPLETE, this.onWallConfigLoaded);
