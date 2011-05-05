@@ -66,6 +66,7 @@ package com.gawk.Engine {
 		}
 		
 		protected function onWallConfigLoaded(event:Event):void {
+			var configLoadedPreviously:Boolean = this.config !== null;  
 			try {
 				this.config = JSON.deserialize(event.target.data);
 			} catch (error:Error) {
@@ -85,9 +86,14 @@ package com.gawk.Engine {
 			this.videos = this.config.videos;
 			
 			this.logger.addLog(Logger.LOG_ACTIVITY, "Wall Config loaded. Video count: " + this.videos.length);
-			this.logger.addLog(Logger.LOG_ERROR, "TODO: Connect to Media Server on demand"); //TODO:
+			//TODO: Connect to Media Server on demand
 			this.mediaServer.connectToMediaServer();
-			this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_LOADED));
+			
+			if (!configLoadedPreviously) {
+				this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_LOADED));
+			} else {
+				this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_UPDATE_LOADED));
+			}
 		}
 		
 		public function saveVideo(filename:String):void {

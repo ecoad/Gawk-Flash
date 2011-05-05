@@ -1,8 +1,8 @@
 package com.gawk.Logger {
 	import com.gawk.Engine.Engine;
-	import com.gawk.Logger.Event.LoggerEvent;
 	
 	import flash.events.EventDispatcher;
+	import flash.external.ExternalInterface;
 	
 	public class Logger	extends EventDispatcher {
 		
@@ -25,6 +25,7 @@ package com.gawk.Logger {
 			var log:String = logLevels[logLevel] + ": " + log;
 			//this.dispatchEvent(new LoggerEvent(LoggerEvent.LOG_ADDED, log));
 			trace(log);
+			ExternalInterface.call("console.log", log);
 			
 			logs.push(log);
 			

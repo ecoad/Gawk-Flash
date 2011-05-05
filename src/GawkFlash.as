@@ -2,10 +2,10 @@ package {
 	import com.gawk.Engine.Engine;
 	import com.gawk.Engine.Event.EngineEvent;
 	import com.gawk.UI.Main.*;
-	import com.gawk.Video.VideoObject;
 	import com.gawk.Wall.Wall;
 	
 	import flash.display.Sprite;
+	import flash.system.Security;
 
 	[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="655")]
 	public class GawkFlash extends Sprite {
@@ -23,6 +23,7 @@ package {
 		protected var testSettings:Boolean = false;
 		
 		public function GawkFlash() {
+			Security.allowDomain("staging.gawkwall.com");
 			this.assignStartupSettings();
 			
 			this.engine = new Engine(this.apiLocation, this.wallId, this.loggedInAtInit, this.testSettings);

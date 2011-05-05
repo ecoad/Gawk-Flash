@@ -15,6 +15,7 @@ package com.gawk.Engine.Event {
 	public class EngineEvent extends Event {
 		
 		public static const WALL_CONFIG_LOADED:String = "wallConfigLoaded";
+		public static const WALL_CONFIG_UPDATE_LOADED:String = "wallConfigUpdateLoaded";
 		public static const MEMBER_LOADED:String = "memberLoaded";
 		public static const VIDEO_SAVED:String = "videoSaved";
 		

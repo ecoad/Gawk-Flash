@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="history/history.css" />
 <!--  END Browser History required section -->
 
-<title>${title}</title>
+<title></title>
 <script src="AC_OETags.js" language="javascript"></script>
 
 <!--  BEGIN Browser History required section -->
@@ -21,11 +21,11 @@
 // -----------------------------------------------------------------------------
 // Globals
 // Major version of Flash required
-var requiredMajorVersion = ${version_major};
+var requiredMajorVersion = 9;
 // Minor version of Flash required
-var requiredMinorVersion = ${version_minor};
+var requiredMinorVersion = 0;
 // Minor version of Flash required
-var requiredRevision = ${version_revision};
+var requiredRevision = 124;
 // -----------------------------------------------------------------------------
 // -->
 </script>
@@ -38,15 +38,15 @@ var requiredRevision = ${version_revision};
 </ul>
 <script type="text/javascript">
   function recordNew() {
-    document.getElementById('${application}').recordNewFromExternal();
+    document.getElementById('GawkFlash').recordNewFromExternal();
   }
 
   function loginMember() {
-    document.getElementById('${application}').logInFromExternal();
+    document.getElementById('GawkFlash').logInFromExternal();
   }
 
   function logOutMember() {
-    document.getElementById('${application}').logOutFromExternal();
+    document.getElementById('GawkFlash').logOutFromExternal();
   }
 </script>
 <script language="JavaScript" type="text/javascript">
@@ -68,13 +68,13 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	AC_FL_RunContent(
 		"src", "playerProductInstall",
 		"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-		"width", "${width}",
-		"height", "${height}",
+		"width", "1050",
+		"height", "655",
 		"align", "middle",
-		"id", "${application}",
+		"id", "GawkFlash",
 		"quality", "high",
-		"bgcolor", "${bgcolor}",
-		"name", "${application}",
+		"bgcolor", "#111111",
+		"name", "GawkFlash",
 		"allowScriptAccess","sameDomain",
 		"type", "application/x-shockwave-flash",
 		"pluginspage", "http://www.adobe.com/go/getflashplayer"
@@ -83,15 +83,15 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	// if we've detected an acceptable version
 	// embed the Flash Content SWF when all tests are passed
 	AC_FL_RunContent(
-			"src", "${swf}",
-			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=gawk",
-			"width", "${width}",
-			"height", "${height}",
+			"src", "GawkFlash",
+			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=wall-4dbee8ad23e2f",
+			"width", "1050",
+			"height", "655",
 			"align", "middle",
-			"id", "${application}",
+			"id", "GawkFlash",
 			"quality", "high",
-			"bgcolor", "${bgcolor}",
-			"name", "${application}",
+			"bgcolor", "#111111",
+			"name", "GawkFlash",
 			"allowScriptAccess","sameDomain",
 			"type", "application/x-shockwave-flash",
 			"pluginspage", "http://www.adobe.com/go/getflashplayer"
@@ -106,14 +106,14 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 </script>
 <noscript>
   	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="${application}" width="${width}" height="${height}"
+			id="GawkFlash" width="1050" height="655"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
-			<param name="movie" value="${swf}.swf" />
+			<param name="movie" value="GawkFlash.swf" />
 			<param name="quality" value="high" />
-			<param name="bgcolor" value="${bgcolor}" />
+			<param name="bgcolor" value="#111111" />
 			<param name="allowScriptAccess" value="sameDomain" />
-			<embed src="${swf}.swf" quality="high" bgcolor="${bgcolor}"
-				width="${width}" height="${height}" name="${application}" align="middle"
+			<embed src="GawkFlash.swf" quality="high" bgcolor="#111111"
+				width="1050" height="655" name="GawkFlash" align="middle"
 				play="true"
 				loop="false"
 				quality="high"
