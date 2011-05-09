@@ -12,6 +12,7 @@ package com.gawk.Video {
 		public var approved:Boolean = false;
 		public var rating:int = 0;
 		public var dateCreated:String = "";
+		public var dateCreatedTime:int;
 		
 		public function VideoObject(videoData:Object = null) {
 			
@@ -42,7 +43,6 @@ package com.gawk.Video {
 				this.member = new Member(videoData.member);
 			}
 		}
-		
 		
 		public function toObject(withMemberObject:Boolean = false):Object {
 			var object:Object = new Object;
