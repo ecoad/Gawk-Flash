@@ -24,8 +24,9 @@ package {
 		
 		public function GawkFlash() {
 			Security.allowDomain("staging.gawkwall.com");
+
 			this.assignStartupSettings();
-			
+		
 			this.engine = new Engine(this.apiLocation, this.wallId, this.loggedInAtInit, this.testSettings);
 			this.engine.addEventListener(EngineEvent.WALL_CONFIG_LOADED, this.onWallConfigLoaded);
 		}

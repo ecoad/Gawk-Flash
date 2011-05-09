@@ -40,6 +40,7 @@ package com.gawk.Wall {
 			}
 
 			this.engine.addEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
+			//this.engine.addEventListener(EngineEvent.WALL_CONFIG_UPDATE_LOADED, this.onWallConfigUpdate);
 
 			this.cameraTile = new CameraTile();
 			this.engine.addEventListener(TileEvent.CAMERA_CANCELLED, this.onCameraCancelled);
@@ -53,7 +54,7 @@ package com.gawk.Wall {
 			this.createTilePositions();
 			this.assignTilesRandomly();
 			
-			this.loadNextWaitingTile();
+			this.loadNextWaitingTileFromConfig();
 		}
 		
 		protected function createTilePositions():void {
@@ -96,12 +97,11 @@ package com.gawk.Wall {
 			}
 		}
 		
-		
 		protected function onVideoLoaded(event:TileEvent):void {
-			this.loadNextWaitingTile();
+			this.loadNextWaitingTileFromConfig();
 		}
 		
-		protected function loadNextWaitingTile():void {
+		protected function loadNextWaitingTileFromConfig():void {
 			var nextTile:Tile = this.waitingTiles.shift();
 			
 			if (nextTile) {
