@@ -12,6 +12,7 @@ package com.gawk.Wall {
 	
 	import flash.display.MovieClip;
 	import flash.external.ExternalInterface;
+	import flash.system.System;
 	
 	public class Wall	extends MovieClip {
 		protected var tile:Tile;
@@ -26,8 +27,14 @@ package com.gawk.Wall {
 		
 		public var wallWidth:int;
 		public var wallHeight:int;
-		public const WALL_WIDTH:int = 1050;
-		public const WALL_HEIGHT:int = 657;
+//		public const WALL_WIDTH:int = 1920; //booth
+//		public const WALL_HEIGHT:int = 1150; 
+		public const WALL_WIDTH:int = 1050; //main
+		public const WALL_HEIGHT:int = 655;
+//		public const WALL_WIDTH:int = 1050; //recent
+//		public const WALL_HEIGHT:int = 131;
+//		public const WALL_WIDTH:int = 175; //profile
+//		public const WALL_HEIGHT:int = 131;
 		
 		protected var shroud:Shroud;
 		
@@ -40,7 +47,7 @@ package com.gawk.Wall {
 			}
 
 			this.engine.addEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-			//this.engine.addEventListener(EngineEvent.WALL_CONFIG_UPDATE_LOADED, this.onWallConfigUpdate);
+			this.engine.addEventListener(EngineEvent.WALL_CONFIG_UPDATE_LOADED, this.onWallConfigUpdate);
 
 			this.cameraTile = new CameraTile();
 			this.engine.addEventListener(TileEvent.CAMERA_CANCELLED, this.onCameraCancelled);
@@ -82,7 +89,7 @@ package com.gawk.Wall {
 				var index:int = Math.round(Math.random() * (this.tilePositions.length - 1));
 				var tilePosition:Array = this.tilePositions.splice(index, 1)[0];
 
-				var tile:Tile = new Tile(this.engine, this,	videos[tileIndex] ? new VideoObject(videos[tileIndex]) : null);
+				var tile:Tile = new Tile(this.engine, this,	videos[tileIndex] ? videos[tileIndex] : null);
 				
 				this.engine.addEventListener(TileEvent.TILE_LOADED, onVideoLoaded);
 				tile.movieClip.x = tilePosition[0];
@@ -95,6 +102,20 @@ package com.gawk.Wall {
 				
 				tileIndex++;
 			}
+		}
+		
+		protected function onWallConfigUpdate(event:EngineEvent):void {
+			this.engine.getVideos().every(function(video:VideoObject, index:int, array:Array):Boolean {
+				if (!video.newVideoAfterInit) {
+					return true; //Continue
+				}
+				
+				engine.logger.addLog(Logger.LOG_ACTIVITY, "Video: " + video.secureId + " assigning to tile");
+				var tile:Tile = getWaitingTile();
+				tile.createVideoTile(video);
+				tile.queueVideo();
+				return false; //Break loop
+			});
 		}
 		
 		protected function onVideoLoaded(event:TileEvent):void {
@@ -154,6 +175,9 @@ package com.gawk.Wall {
 			return tile;
 		}
 		
+		/**
+		 * When a camera cancels
+		 */
 		protected function replaceWaitingTile():void {
 			var tile:Tile = this.tiles.shift();
 			this.tiles.push(tile);

@@ -38,12 +38,14 @@ package com.gawk.MediaServer {
 		}
 		
 		public function connectToMediaServer():void {
-			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connecting to Media Server... " + engine.getMediaServerLocation());
-			netConnection = new NetConnection();
-			netConnection.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
-			netConnection.connect(engine.getMediaServerLocation());
-			
-			this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTING));
+			if (this.netConnection === null) {
+				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connecting to Media Server... " + engine.getMediaServerLocation());
+				this.netConnection = new NetConnection();
+				this.netConnection.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
+				this.netConnection.connect(engine.getMediaServerLocation());
+				
+				this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTING));
+			}
 		}
 		
 		/**

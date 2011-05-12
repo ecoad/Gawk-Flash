@@ -9,10 +9,10 @@ package com.gawk.Video {
 		public var member:Member = null;
 		public var hash:String = "";
 		public var uploadSource:String = "";
-		public var approved:Boolean = false;
+		public var approved:Boolean = true;
 		public var rating:int = 0;
 		public var dateCreated:String = "";
-		public var dateCreatedTime:int;
+		public var newVideoAfterInit:Boolean = false;
 		
 		public function VideoObject(videoData:Object = null) {
 			
@@ -42,6 +42,10 @@ package com.gawk.Video {
 			if (videoData.member) {
 				this.member = new Member(videoData.member);
 			}
+			
+			if (videoData.newVideoAfterInit !== null) {
+				this.newVideoAfterInit = videoData.newVideoAfterInit;
+			}
 		}
 		
 		public function toObject(withMemberObject:Boolean = false):Object {
@@ -58,6 +62,7 @@ package com.gawk.Video {
 			object.uploadSource = this.uploadSource;
 			object.wallSecureId = this.wallSecureId;
 			object.memberSecureId = this.memberSecureId;
+			object.newVideoAfterInit = this.newVideoAfterInit;
 			
 			return object;
 		}

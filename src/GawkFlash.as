@@ -7,27 +7,27 @@ package {
 	import flash.display.Sprite;
 	import flash.system.Security;
 
-	[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="655")]
+	//[SWF(backgroundColor="#111111", frameRate="15", width="175", height="131")] //profile gawk
+	//[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="131")] //recent profile
+	[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="655")] //main
+	//[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="1150")] //booth
 	public class GawkFlash extends Sprite {
 		
 		protected var wall:Wall;
 		protected var engine:Engine;
 		
-		public static const GAWK_WIDTH:int = 1050;
-		public static const GAWK_HEIGHT:int = 655;
-		
 		protected var wallId:String = "";
 		protected var apiLocation:String = "";
-		
+		protected var profileSecureId:String = "";
 		protected var loggedInAtInit:Boolean = false;
-		protected var testSettings:Boolean = false;
+		
 		
 		public function GawkFlash() {
 			Security.allowDomain("staging.gawkwall.com");
 
 			this.assignStartupSettings();
 		
-			this.engine = new Engine(this.apiLocation, this.wallId, this.loggedInAtInit, this.testSettings);
+			this.engine = new Engine(this.apiLocation, this.wallId, this.loggedInAtInit, this.profileSecureId);
 			this.engine.addEventListener(EngineEvent.WALL_CONFIG_LOADED, this.onWallConfigLoaded);
 		}
 		
@@ -35,11 +35,12 @@ package {
 			this.apiLocation = this.loaderInfo.parameters.apiLocation;
 			this.wallId = this.loaderInfo.parameters.wallId;
 			this.loggedInAtInit = this.loaderInfo.parameters.loggedInAtInit;
+			this.profileSecureId = this.loaderInfo.parameters.profileSecureId;
 			
 			if (!this.apiLocation) {
 				throw new Error("Must provide API Location");
 			} 
-			this.testSettings = true;
+			
 		}
 		
 		protected function onWallConfigLoaded(event:EngineEvent):void {

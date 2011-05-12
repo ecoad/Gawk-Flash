@@ -1,11 +1,12 @@
 package com.gawk.Tile {
+	import com.gawk.Logger.Logger;
 	import com.gawk.MediaServer.Event.MediaServerEvent;
 	import com.gawk.Tile.Event.TileEvent;
 	import com.gawk.UI.TileButton;
 	
 	import flash.display.MovieClip;
-	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.external.ExternalInterface;
 	import flash.media.Camera;
 	import flash.media.Video;
 	
@@ -24,7 +25,9 @@ package com.gawk.Tile {
 		public function setParentTile(parentTile:Tile):void {
 			this.parentTile = parentTile;
 			if (this.camera == null) {
-				this.loadCamera();
+				if (!this.loadCamera()) {
+					return;
+				}
 				this.removePublishingEventListeners();
 				
 				this.parentTile.getEngine().getMediaServer().addEventListener(MediaServerEvent.PUBLISHING_COMPLETE, this.onPublishingComplete);
@@ -47,8 +50,13 @@ package com.gawk.Tile {
 			} catch (error:Error) {}
 		}
 		
-		public function loadCamera():void {
+		public function loadCamera():Boolean {
 			this.camera = Camera.getCamera();
+			if ((this.camera === null) || (this.camera.muted == true)) {
+				this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "No camera detected");
+				ExternalInterface.call("$(document).trigger", "GawkUINoWebcamOverlayShow");
+				return false;
+			}
 			this.camera.setMode(Tile.getWidth(), Tile.getHeight(), 17, true);
 			this.camera.setQuality(22500, 0);
 			this.camera.setKeyFrameInterval(100);
@@ -63,6 +71,8 @@ package com.gawk.Tile {
 			this.addChild(this.video);
 			
 			this.addUI();
+			
+			return true;
 		}
 		
 		protected function addUI():void {

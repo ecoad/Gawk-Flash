@@ -12,6 +12,7 @@ package com.gawk.Member {
 		
 		protected var engine:Engine;
 		protected var memberData:Member;
+		protected var loggedIn:Boolean = false;
 		
 		public function MemberControl(engine:Engine) {
 			this.engine = engine;
@@ -43,6 +44,7 @@ package com.gawk.Member {
 		}
 		
 		protected function onMemberLoaded(event:EngineEvent):void {
+			this.loggedIn = true;
 			this.engine.removeEventListener(EngineEvent.MEMBER_LOADED, this.onMemberLoaded);
 			this.memberData = new Member(event.data.member);
 			
@@ -52,6 +54,10 @@ package com.gawk.Member {
 		
 		public function getMemberData():Member {
 			return this.memberData;
+		}
+		
+		public function isLoggedIn():Boolean {
+			return this.loggedIn;
 		}
 	}
 }

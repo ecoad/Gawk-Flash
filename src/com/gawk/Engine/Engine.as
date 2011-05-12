@@ -13,6 +13,7 @@ package com.gawk.Engine {
 	import flash.events.TimerEvent;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
+	import flash.system.System;
 	import flash.utils.Timer;
 	
 	public class Engine	extends EventDispatcher {
@@ -24,21 +25,21 @@ package com.gawk.Engine {
 		protected var config:Object;
 		
 		protected var wallSecureId:String;
+		protected var profileSecureId:String;
 		protected var mediaServerLocation:String;
 		protected var serviceLocation:String;
 		protected var binaryLocation:String;
 		protected var randomWallId:String;
 		
 		protected var videos:Array = new Array();
-		protected var videosHash:String;
-		protected var timeOfLastWallConfigResponse:int;
+		protected var previousRunTime:int = 0;
 		
 		protected var testSettings:Boolean;
 		
 		protected var retrievingLoggedInMember:Boolean = false;
 		protected var wallConfigUpdateTimer:Timer;
 		
-		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, testSettings:Boolean) {
+		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, profileSecureId:String) {
 			this.logger = new Logger(this);
 			this.mediaServer = new MediaServer(this);
 			this.memberControl = new MemberControl(this);
@@ -50,6 +51,7 @@ package com.gawk.Engine {
 			
 			this.serviceLocation = serviceLocation;
 			this.wallSecureId = wallSecureId;
+			this.profileSecureId = profileSecureId;
 			this.testSettings = testSettings;
 			
 			if (loggedInAtInit) {
@@ -69,7 +71,15 @@ package com.gawk.Engine {
 			if (this.isWallSecureIdSet()) {
 				variables.WallSecureId = this.getWallSecureId();
 			}
+			
+			if (this.isProfileSecureIdSet()) {
+				variables.ProfileSecureId = this.getProfileSecureId();
+			}
+			
 			variables.Action = "Flash.InitApplication";
+			if (this.previousRunTime !== 0) {
+				variables.PreviousRunTime = this.previousRunTime;
+			}
 			
 			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
 			urlLoader.addEventListener(Event.COMPLETE, this.onWallConfigLoaded);
@@ -95,14 +105,9 @@ package com.gawk.Engine {
 			if (!this.mediaServerLocation || !this.binaryLocation) {
 				throw new Error("Must provide mediaServerLocation and binaryLocation: " + event.target.data);
 			}
-			var videosHashChange:Boolean = this.videosHash !== this.config.videosHash;
-			this.videosHash = this.config.videosHash;
+			this.previousRunTime = this.config.previousRunTime;
 			
-			var previousTimeOfLastWallConfigResponse:int = this.timeOfLastWallConfigResponse;
-			this.timeOfLastWallConfigResponse = this.config.timeOfLastWallConfigResponse;
-			
-			var existingVideoIds:Array = this.getVideoIds(this.videos);
-			this.videos = this.config.videos;
+			this.setVideos(this.config.videos);
 			
 			if (!configLoadedPreviously) {
 				//TODO: Connect to Media Server on demand
@@ -110,9 +115,8 @@ package com.gawk.Engine {
 				this.logger.addLog(Logger.LOG_ACTIVITY, "Wall Config loaded. Video count: " + this.videos.length);
 				this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_LOADED));
 			} else {
-				if (videosHashChange) {
-					this.getNewVideos(previousTimeOfLastWallConfigResponse, this.videos);
-					this.logger.addLog(Logger.LOG_ACTIVITY, "Videos changed. Video count: " + this.videos.length);
+				if (this.config.videos.length > 0) {
+					this.logger.addLog(Logger.LOG_ACTIVITY, "Videos changed. New videos: " + this.config.videos.length);
 					this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_UPDATE_LOADED));
 				}
 			}
@@ -120,12 +124,9 @@ package com.gawk.Engine {
 			this.wallConfigUpdateTimer.stop();
 			this.wallConfigUpdateTimer.delay = this.config.updatePollLength;
 			this.wallConfigUpdateTimer.start();
-		}
-		
-		protected function getNewVideos(previousTimeOfLastWallConfigResponse:int, videos:Array):void {
-			videos.every(function(video:Object, index:int, array:Array):Boolean {
-				return true;
-			});
+			
+			
+			this.logger.addLog(Logger.LOG_ACTIVITY, "Total memory: " + Math.round(System.totalMemory / 1024) + "kB");
 		}
 		
 		public function saveVideo(filename:String):void {
@@ -207,10 +208,6 @@ package com.gawk.Engine {
 				var variables:URLVariables = new URLVariables();
 				variables.Action = "Member.GetLoggedInMember";
 				
-				if (this.isTestSettings()) {
-					variables.Token = "test1234";
-				}
-				
 				var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
 				urlLoader.addEventListener(Event.COMPLETE, this.onLoggedInMemberResponse);
 				urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
@@ -254,14 +251,6 @@ package com.gawk.Engine {
 			return this.videos;
 		}
 		
-		public function getWallSecureId():String {
-			return this.wallSecureId;
-		}
-		
-		public function isTestSettings():Boolean {
-			return this.testSettings;
-		}
-		
 		public function getUniqueFileName():String {
 			var chars:String = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345679";
 			var num:int = chars.length;
@@ -275,21 +264,32 @@ package com.gawk.Engine {
 			return "gk-" + fileName;
 		}
 		
+		public function getWallSecureId():String {
+			return this.wallSecureId;
+		}
+		
 		protected function isWallSecureIdSet():Boolean {
 			return (this.getWallSecureId() != null) && (this.getWallSecureId() != ""); 
+		}
+		
+		public function getProfileSecureId():String {
+			return this.profileSecureId;
+		}
+		
+		protected function isProfileSecureIdSet():Boolean {
+			return this.getProfileSecureId() != ""; 
 		}
 		
 		public function getMemberControl():MemberControl {
 			return this.memberControl;
 		}
-		
-		protected function getVideoIds(videos:Array):Array {
-			var videoIds:Array = new Array();
-			videos.every(function(video:Object, index:int, array:Array):void {
-				videoIds.push(video.secureId);
+	
+		protected function setVideos(newVideos:Array):void {
+			//TODO: Set so max is 30
+			newVideos.every(function(videoData:Object, index:int, array:Array):Boolean {
+				videos.push(new VideoObject(videoData));
+				return true;
 			});
-			
-			return videoIds;
 		}
 	}
 }

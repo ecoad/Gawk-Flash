@@ -6,8 +6,8 @@ package com.gawk.Logger {
 	
 	public class Logger	extends EventDispatcher {
 		
-		public static const LOG_ACTIVITY:int = 1;
 		public static const LOG_ERROR:int = 2;
+		public static const LOG_ACTIVITY:int = 1;
 		
 		protected var engine:Engine;
 		

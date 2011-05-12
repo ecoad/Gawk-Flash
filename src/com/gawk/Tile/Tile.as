@@ -12,6 +12,8 @@ package com.gawk.Tile {
 	public class Tile	extends EventDispatcher {
 		public static var tileWidth:int = 175;
 		public static var tileHeight:int = 131;
+//		public static var tileWidth:int = 320;
+//		public static var tileHeight:int = 230;
 		public var tileIndex:int;
 		
 		public var movieClip:MovieClip;

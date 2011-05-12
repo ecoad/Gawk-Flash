@@ -33,8 +33,8 @@ var requiredRevision = 124;
 
 <ul>
   <li><a href="#" onclick="recordNew();">Record</a></li>
-  <li><a href="#" onclick="loginMember();">Login Member</a></li>
-  <li><a href="#" onclick="logOutMember();">Logout Member</a></li>
+  <!-- <li><a href="#" onclick="loginMember();">Login Member</a></li> -->
+  <!-- <li><a href="#" onclick="logOutMember();">Logout Member</a></li> -->
 </ul>
 <script type="text/javascript">
   function recordNew() {
@@ -85,6 +85,7 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	AC_FL_RunContent(
 			"src", "GawkFlash",
 			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=gawk",
+//			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=profile-recent&profileSecureId=u-4dc5457e5a441",
 			"width", "1050",
 			"height", "655",
 			"align", "middle",
