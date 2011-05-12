@@ -5,6 +5,7 @@ package {
 	import com.gawk.Wall.Wall;
 	
 	import flash.display.Sprite;
+	import flash.external.ExternalInterface;
 	import flash.system.Security;
 
 	//[SWF(backgroundColor="#111111", frameRate="15", width="175", height="131")] //profile gawk
@@ -40,11 +41,11 @@ package {
 			if (!this.apiLocation) {
 				throw new Error("Must provide API Location");
 			} 
-			
 		}
 		
 		protected function onWallConfigLoaded(event:EngineEvent):void {
 			this.addWall();
+			ExternalInterface.call("$(document).trigger", "GawkUIFlashLoaded");
 		}
 		
 		protected function addWall():void {
