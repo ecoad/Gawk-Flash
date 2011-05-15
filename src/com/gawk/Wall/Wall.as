@@ -9,10 +9,10 @@ package com.gawk.Wall {
 	import com.gawk.Tile.VideoTile;
 	import com.gawk.UI.Main.Shroud;
 	import com.gawk.Video.VideoObject;
+	import com.utils.FPSMonitor;
 	
 	import flash.display.MovieClip;
 	import flash.external.ExternalInterface;
-	import flash.system.System;
 	
 	public class Wall	extends MovieClip {
 		protected var tile:Tile;
@@ -27,10 +27,10 @@ package com.gawk.Wall {
 		
 		public var wallWidth:int;
 		public var wallHeight:int;
-//		public const WALL_WIDTH:int = 1920; //booth
-//		public const WALL_HEIGHT:int = 1150; 
-		public const WALL_WIDTH:int = 1050; //main
-		public const WALL_HEIGHT:int = 655;
+		public const WALL_WIDTH:int = 1920; //booth
+		public const WALL_HEIGHT:int = 1150; 
+//		public const WALL_WIDTH:int = 1050; //main
+//		public const WALL_HEIGHT:int = 655;
 //		public const WALL_WIDTH:int = 1050; //recent
 //		public const WALL_HEIGHT:int = 131;
 //		public const WALL_WIDTH:int = 175; //profile
@@ -89,7 +89,7 @@ package com.gawk.Wall {
 				var index:int = Math.round(Math.random() * (this.tilePositions.length - 1));
 				var tilePosition:Array = this.tilePositions.splice(index, 1)[0];
 
-				var tile:Tile = new Tile(this.engine, this,	videos[tileIndex] ? videos[tileIndex] : null);
+				var tile:Tile = new Tile(this.engine, this,	videos[tileIndex] ? videos[tileIndex] : null, tileIndex);
 				
 				this.engine.addEventListener(TileEvent.TILE_LOADED, onVideoLoaded);
 				tile.movieClip.x = tilePosition[0];
@@ -102,6 +102,8 @@ package com.gawk.Wall {
 				
 				tileIndex++;
 			}
+			
+			this.addChild(new FPSMonitor());
 		}
 		
 		protected function onWallConfigUpdate(event:EngineEvent):void {
@@ -114,6 +116,7 @@ package com.gawk.Wall {
 				var tile:Tile = getWaitingTile();
 				tile.createVideoTile(video);
 				tile.queueVideo();
+				video.newVideoAfterInit = false;
 				return false; //Break loop
 			});
 		}

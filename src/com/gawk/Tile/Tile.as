@@ -10,11 +10,13 @@ package com.gawk.Tile {
 	import flash.events.EventDispatcher;
 	
 	public class Tile	extends EventDispatcher {
-		public static var tileWidth:int = 175;
-		public static var tileHeight:int = 131;
-//		public static var tileWidth:int = 320;
-//		public static var tileHeight:int = 230;
+//		public static var tileWidth:int = 175; //Main
+//		public static var tileHeight:int = 131;
+		public static var tileWidth:int = 320; //Booth
+		public static var tileHeight:int = 230;
 		public var tileIndex:int;
+		
+		protected var stageIndex:int = 0;
 		
 		public var movieClip:MovieClip;
 		
@@ -23,9 +25,11 @@ package com.gawk.Tile {
 		protected var engine:Engine;
 		protected var wall:Wall;
 		
-		public function Tile(engine:Engine, wall:Wall, videoObject:VideoObject = null) {
+		public function Tile(engine:Engine, wall:Wall, videoObject:VideoObject = null, stageIndex:int = 0) {
 			this.engine = engine;
 			this.wall = wall;
+			
+			this.stageIndex = stageIndex;
 			
 			this.createTile();
 			
@@ -77,7 +81,7 @@ package com.gawk.Tile {
 		
 		public function queueVideo():void {
 			if (this.videoTile is VideoTile) {
-				this.videoTile.loadVideo();
+				this.videoTile.loadVideo(this.stageIndex);
 			} else {
 				dispatchEvent(new TileEvent(TileEvent.TILE_LOADED, null));
 			}

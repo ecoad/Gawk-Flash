@@ -11,6 +11,7 @@ package com.gawk.Engine {
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
+	import flash.media.StageVideo;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.system.System;
@@ -124,9 +125,6 @@ package com.gawk.Engine {
 			this.wallConfigUpdateTimer.stop();
 			this.wallConfigUpdateTimer.delay = this.config.updatePollLength;
 			this.wallConfigUpdateTimer.start();
-			
-			
-			this.logger.addLog(Logger.LOG_ACTIVITY, "Total memory: " + Math.round(System.totalMemory / 1024) + "kB");
 		}
 		
 		public function saveVideo(filename:String):void {

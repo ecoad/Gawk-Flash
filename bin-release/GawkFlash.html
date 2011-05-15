@@ -33,8 +33,8 @@ var requiredRevision = 124;
 
 <ul>
   <li><a href="#" onclick="recordNew();">Record</a></li>
-  <li><a href="#" onclick="loginMember();">Login Member</a></li>
-  <li><a href="#" onclick="logOutMember();">Logout Member</a></li>
+  <!-- <li><a href="#" onclick="loginMember();">Login Member</a></li> -->
+  <!-- <li><a href="#" onclick="logOutMember();">Logout Member</a></li> -->
 </ul>
 <script type="text/javascript">
   function recordNew() {
@@ -68,8 +68,8 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	AC_FL_RunContent(
 		"src", "playerProductInstall",
 		"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-		"width", "1050",
-		"height", "655",
+		"width", "1920",
+		"height", "1150",
 		"align", "middle",
 		"id", "GawkFlash",
 		"quality", "high",
@@ -84,9 +84,10 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	// embed the Flash Content SWF when all tests are passed
 	AC_FL_RunContent(
 			"src", "GawkFlash",
-			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=wall-4dbee8ad23e2f",
-			"width", "1050",
-			"height", "655",
+			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=gawk",
+//			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=profile-recent&profileSecureId=u-4dc5457e5a441",
+			"width", "1920",
+			"height", "1150",
 			"align", "middle",
 			"id", "GawkFlash",
 			"quality", "high",
@@ -106,14 +107,14 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 </script>
 <noscript>
   	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="GawkFlash" width="1050" height="655"
+			id="GawkFlash" width="1920" height="1150"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
 			<param name="movie" value="GawkFlash.swf" />
 			<param name="quality" value="high" />
 			<param name="bgcolor" value="#111111" />
 			<param name="allowScriptAccess" value="sameDomain" />
 			<embed src="GawkFlash.swf" quality="high" bgcolor="#111111"
-				width="1050" height="655" name="GawkFlash" align="middle"
+				width="1920" height="1150" name="GawkFlash" align="middle"
 				play="true"
 				loop="false"
 				quality="high"
