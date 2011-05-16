@@ -43,6 +43,7 @@ package com.gawk.Engine {
 					break;
 				case "NetStream.Play.NoSupportedTrackFound":
 					this.engine.logger.addLog(Logger.LOG_ERROR, "VideoLoader: NetStream.Play.NoSupportedTrackFound");
+					this.dispatchEvent(new VideoLoaderEvent(VideoLoaderEvent.VIDEO_LOADED));
 				default:
 					//this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, this.videoLocation + ": " + event.info.code); 
 			}

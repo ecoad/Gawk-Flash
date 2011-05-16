@@ -21,11 +21,11 @@
 // -----------------------------------------------------------------------------
 // Globals
 // Major version of Flash required
-var requiredMajorVersion = 9;
+var requiredMajorVersion = 10;
 // Minor version of Flash required
-var requiredMinorVersion = 0;
+var requiredMinorVersion = 2;
 // Minor version of Flash required
-var requiredRevision = 124;
+var requiredRevision = 0;
 // -----------------------------------------------------------------------------
 // -->
 </script>
@@ -69,7 +69,7 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 		"src", "playerProductInstall",
 		"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
 		"width", "1920",
-		"height", "1150",
+		"height", "920",
 		"align", "middle",
 		"id", "GawkFlash",
 		"quality", "high",
@@ -84,10 +84,11 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	// embed the Flash Content SWF when all tests are passed
 	AC_FL_RunContent(
 			"src", "GawkFlash",
-			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=gawk",
+			"flashVars", "apiLocation=http://staging.gawkwall.com/api/&wallId=gawk&useStageVideo=false&useDebugOverlay=true",
 //			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=profile-recent&profileSecureId=u-4dc5457e5a441",
 			"width", "1920",
-			"height", "1150",
+			"wmode", "direct",
+			"height", "920",
 			"align", "middle",
 			"id", "GawkFlash",
 			"quality", "high",
@@ -107,14 +108,14 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 </script>
 <noscript>
   	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="GawkFlash" width="1920" height="1150"
+			id="GawkFlash" width="1920" height="920"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
 			<param name="movie" value="GawkFlash.swf" />
 			<param name="quality" value="high" />
 			<param name="bgcolor" value="#111111" />
 			<param name="allowScriptAccess" value="sameDomain" />
 			<embed src="GawkFlash.swf" quality="high" bgcolor="#111111"
-				width="1920" height="1150" name="GawkFlash" align="middle"
+				width="1920" height="920" name="GawkFlash" align="middle"
 				play="true"
 				loop="false"
 				quality="high"

@@ -43,16 +43,19 @@ package com.gawk.Tile {
 		}
 		
 		public function loadVideo(stageIndex:int = -1):void {
-			/*
-			*/
-			try {
-				this.video = stage.stageVideos[stageIndex];
-				this.video.addEventListener(StageVideoEvent.RENDER_STATE, onStageVideoStateChange);
-				this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "using StageVideo!");
-			} catch (error:Error) {
-				this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "using Video");
+			if (!this.parentTile.getEngine().allowStageVideo()) {
 				this.video = new Video();
 				this.addChild(this.video);
+			} else {
+				try {
+					this.video = stage.stageVideos[stageIndex];
+					this.video.addEventListener(StageVideoEvent.RENDER_STATE, onStageVideoStateChange);
+					this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "using StageVideo!");
+				} catch (error:Error) {
+					this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "using Video");
+					this.video = new Video();
+					this.addChild(this.video);
+				}
 			}
 			
 			if (this.getParentTile().getEngine().getMemberControl().isLoggedIn()) {

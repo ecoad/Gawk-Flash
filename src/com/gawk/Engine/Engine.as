@@ -31,6 +31,8 @@ package com.gawk.Engine {
 		protected var serviceLocation:String;
 		protected var binaryLocation:String;
 		protected var randomWallId:String;
+		protected var useStageVideo:Boolean;
+		protected var useDebugOverlay:Boolean;
 		
 		protected var videos:Array = new Array();
 		protected var previousRunTime:int = 0;
@@ -40,10 +42,13 @@ package com.gawk.Engine {
 		protected var retrievingLoggedInMember:Boolean = false;
 		protected var wallConfigUpdateTimer:Timer;
 		
-		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, profileSecureId:String) {
+		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, profileSecureId:String, useStageVideo:Boolean, useDebugOverlay:Boolean) {
 			this.logger = new Logger(this);
 			this.mediaServer = new MediaServer(this);
 			this.memberControl = new MemberControl(this);
+			
+			this.useStageVideo = useStageVideo;
+			this.useDebugOverlay = useDebugOverlay;
 			
 			this.wallConfigUpdateTimer = new Timer(10000);
 			this.wallConfigUpdateTimer.addEventListener(TimerEvent.TIMER, function (event:TimerEvent):void {
@@ -108,7 +113,9 @@ package com.gawk.Engine {
 			}
 			this.previousRunTime = this.config.previousRunTime;
 			
-			this.setVideos(this.config.videos);
+			if (this.config.videos.length > 0) {
+				this.setVideos(this.config.videos);
+			}
 			
 			if (!configLoadedPreviously) {
 				//TODO: Connect to Media Server on demand
@@ -283,11 +290,38 @@ package com.gawk.Engine {
 		}
 	
 		protected function setVideos(newVideos:Array):void {
-			//TODO: Set so max is 30
 			newVideos.every(function(videoData:Object, index:int, array:Array):Boolean {
-				videos.push(new VideoObject(videoData));
+				var videoObject:VideoObject = new VideoObject(videoData);
+				if (!isVideoIdAlreadyInCollection(videoObject.secureId)) {
+					videos.push(videoObject);
+				}
 				return true;
 			});
+			
+			if (this.videos.length > 30) {
+				this.videos = this.videos.slice(this.videos.length - 30);
+			}
+		}
+		
+		protected function isVideoIdAlreadyInCollection(secureId:String):Boolean {
+			var videosLength:int = this.videos.length;
+			for (var i:int = 0; i < videosLength; i++) {
+				var videoObject:VideoObject = this.videos[i];
+				if (videoObject.secureId == secureId) {
+					this.logger.addLog(Logger.LOG_ACTIVITY, "Video: " + secureId + " duplicate");
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
+		public function allowStageVideo():Boolean {
+			return this.useStageVideo;
+		}
+		
+		public function allowDebugOverlay():Boolean {
+			return this.useDebugOverlay;
 		}
 	}
 }

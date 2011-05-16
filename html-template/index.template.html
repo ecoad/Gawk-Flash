@@ -84,9 +84,10 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	// embed the Flash Content SWF when all tests are passed
 	AC_FL_RunContent(
 			"src", "${swf}",
-			"flashVars", "apiLocation=http://staging.gawkwall.com/api/&wallId=gawk",
+			"flashVars", "apiLocation=http://staging.gawkwall.com/api/&wallId=gawk&useStageVideo=false&useDebugOverlay=true",
 //			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=profile-recent&profileSecureId=u-4dc5457e5a441",
 			"width", "${width}",
+			"wmode", "direct",
 			"height", "${height}",
 			"align", "middle",
 			"id", "${application}",
