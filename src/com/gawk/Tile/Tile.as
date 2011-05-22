@@ -10,10 +10,10 @@ package com.gawk.Tile {
 	import flash.events.EventDispatcher;
 	
 	public class Tile	extends EventDispatcher {
-//		public static var tileWidth:int = 175; //Main
-//		public static var tileHeight:int = 131;
-		public static var tileWidth:int = 320; //Booth
-		public static var tileHeight:int = 230;
+		public static var tileWidth:int = 175; //Main
+		public static var tileHeight:int = 131;
+//		public static var tileWidth:int = 320; //Booth
+//		public static var tileHeight:int = 230;
 		public var tileIndex:int;
 		
 		protected var stageIndex:int = 0;

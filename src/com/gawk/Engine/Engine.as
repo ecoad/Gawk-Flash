@@ -11,7 +11,6 @@ package com.gawk.Engine {
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
-	import flash.media.StageVideo;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.system.System;
@@ -42,12 +41,11 @@ package com.gawk.Engine {
 		protected var retrievingLoggedInMember:Boolean = false;
 		protected var wallConfigUpdateTimer:Timer;
 		
-		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, profileSecureId:String, useStageVideo:Boolean, useDebugOverlay:Boolean) {
+		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, profileSecureId:String, useDebugOverlay:Boolean) {
 			this.logger = new Logger(this);
 			this.mediaServer = new MediaServer(this);
 			this.memberControl = new MemberControl(this);
 			
-			this.useStageVideo = useStageVideo;
 			this.useDebugOverlay = useDebugOverlay;
 			
 			this.wallConfigUpdateTimer = new Timer(10000);

@@ -52,7 +52,7 @@ package com.gawk.Tile {
 		
 		public function loadCamera():Boolean {
 			this.camera = Camera.getCamera();
-			if ((this.camera === null) || (this.camera.muted == true)) {
+			if (this.camera === null) {
 				this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "No camera detected");
 				ExternalInterface.call("$(document).trigger", "GawkUINoWebcamOverlayShow");
 				return false;
