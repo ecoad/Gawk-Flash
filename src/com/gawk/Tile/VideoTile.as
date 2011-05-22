@@ -41,12 +41,10 @@ package com.gawk.Tile {
 			this.video = new Video();
 			this.addChild(this.video);
 			
-			if (this.getParentTile().getEngine().getMemberControl().isLoggedIn()) {
-				this.addVideoTileOverlay();
-			}
+			this.addVideoTileOverlay();
 			
 			if (this.newlySubmitted) {
-				this.addRecordUI();
+				this.addReRecordUI();
 			}
 			
 			this.playVideo();
@@ -74,7 +72,7 @@ package com.gawk.Tile {
 			}
 		}
 
-		protected function addRecordUI():void {
+		protected function addReRecordUI():void {
 			if (this.reRecordButton === null) {
 				this.addReRecordButton();
 				this.addSaveButton();

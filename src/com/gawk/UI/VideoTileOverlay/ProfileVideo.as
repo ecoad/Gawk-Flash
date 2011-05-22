@@ -24,7 +24,7 @@ package com.gawk.UI.VideoTileOverlay {
 		}
 		
 		public function loadVideo():void {
-			if (!this.videoInit) {
+			if (!this.videoInit && (this.videoLocation != "")) {
 				this.videoInit = true;
 				
 				this.videoLoader = new VideoLoader(this.engine);

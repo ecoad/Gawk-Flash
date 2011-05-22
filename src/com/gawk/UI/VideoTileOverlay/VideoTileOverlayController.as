@@ -2,11 +2,17 @@ package com.gawk.UI.VideoTileOverlay {
 	import com.gawk.Engine.Engine;
 	import com.gawk.Graphics.VideoTileOverlay;
 	import com.gawk.Graphics.VideoTileOverlay.*;
+	import com.gawk.Member.Event.MemberEvent;
+	import com.gawk.Member.Member;
+	import com.gawk.Member.VideoAction.MemberVideoRatingAction;
 	import com.gawk.Tile.VideoTile;
 	import com.gawk.UI.TileButton;
 	
 	import flash.events.EventDispatcher;
 	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
+	import flash.ui.Mouse;
 	
 	public class VideoTileOverlayController extends EventDispatcher {
 		
@@ -25,61 +31,86 @@ package com.gawk.UI.VideoTileOverlay {
 			this.panel = new VideoTileOverlay();
 			this.panel.visible = false;
 			
-			this.addUiEventListners();
+			this.addUiEventListeners();
 			this.setName(this.parentTile.getVideoObject().member.alias);
-			this.setProfileVideo(this.parentTile.getVideoObject().member.profileVideoLocation);
 		}
 		
-		protected function addUiEventListners():void {
+		protected function addUiEventListeners():void {
 			this.parentTile.addEventListener(MouseEvent.MOUSE_OVER, function (event:MouseEvent):void {
 				panel.visible = true;
-				profileVideo.loadVideo();
+				setProfileVideo();
 			});
 			this.parentTile.addEventListener(MouseEvent.MOUSE_OUT, function (event:MouseEvent):void {
 				panel.visible = false;
 			});
+			this.panel.favouriteButton.addEventListener(MouseEvent.CLICK, onFavouriteClick);
 		}
 		
 		protected function setName(name:String):void {
 			this.panel.profile.aliasText.text = name;
 		}
 		
-		protected function setProfileVideo(profileVideoLocation:String):void {
-			this.profileVideo = new ProfileVideo(this, this.engine, profileVideoLocation);
-			this.panel.profile.addChild(this.profileVideo.getVideo());
-		}
-		
-		protected function onLogin():void {
-		}
-		
-		protected function onLogout():void {
-		}
-		
-		public function enableRateUpButton():void {
-		}
-		public function disableRateUpButton():void {
-		}
-		
-		public function enableDeleteButton():void {
-		}
-		public function disableDeleteButton():void {
-		}
-		
-		public function onRateUpClick():void {
-		}
-		public function onRateDownClick():void {
+		protected function setProfileVideo():void {
+			var profileVideoLocation:String = this.parentTile.getVideoObject().member.profileVideoLocation;
+			if ((profileVideoLocation != "") && (this.profileVideo == null)) {
+				this.profileVideo = new ProfileVideo(this, this.engine, profileVideoLocation);
+				this.profileVideo.loadVideo();
+				this.panel.profile.addChild(this.profileVideo.getVideo());
+			}
 		}
 		
 		public function onProfileClick():void {
+			navigateToURL(new URLRequest("/u/" + this.parentTile.getVideoObject().member.alias), "_SELF");
 		}
 		
 		public function onViewGawkClick():void {
+			navigateToURL(
+				new URLRequest(
+					"/u/" + this.parentTile.getVideoObject().member.alias + "/gawk/" + this.parentTile.getVideoObject().secureId), 
+				"_SELF");
 		}
 		
-		public function onFavouriteClick():void {
+		protected function onFavouriteClick(event:MouseEvent):void {
+			var action:MemberVideoRatingAction = new MemberVideoRatingAction();
+			action.setVideoSecureId(this.parentTile.getVideoObject().secureId);
+			action.setPositiveRating(true);
+			this.engine.getMemberControl().addEventListener(
+				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onFavouriteClickResponse);
+			this.engine.getMemberControl().dispatchEvent(
+				new MemberEvent(MemberEvent.MEMBER_VIDEO_ADD_RATING_REQUEST, action));
 		}
 		
-		public function onDeleteClick():void {
+		protected function onFavouriteClickResponse(event:MemberEvent):void {
+			this.engine.getMemberControl().removeEventListener(
+				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onFavouriteClickResponse);
+			showFavouriteButtonIsActive();
+		}
+		
+		protected function showFavouriteButtonIsActive():void {
+			this.panel.favouriteButton.alpha = 1;
+		}
+		
+		protected function onHateClick(event:MouseEvent):void {
+			var action:MemberVideoRatingAction = new MemberVideoRatingAction();
+			action.setVideoSecureId(this.parentTile.getVideoObject().secureId);
+			action.setPositiveRating(false);
+			this.engine.getMemberControl().addEventListener(
+				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onHateClickResponse);
+			this.engine.getMemberControl().dispatchEvent(
+				new MemberEvent(MemberEvent.MEMBER_VIDEO_ADD_RATING_REQUEST, action));
+		}
+		
+		protected function onHateClickResponse(event:MemberEvent):void {
+			this.engine.getMemberControl().removeEventListener(
+				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onHateClickResponse);
+			showHateButtonIsActive();
+		}
+		
+		protected function showHateButtonIsActive():void {
+			this.panel.hateButton.alpha = 0.5;
+		}
+		
+		protected function onDeleteClick(event:MouseEvent):void {
 		}
 		
 		/*

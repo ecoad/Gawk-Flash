@@ -42,11 +42,6 @@ package com.gawk.Wall {
 		
 		public function Wall(engine:Engine) {
 			this.engine = engine;
-			if (!this.engine.getMediaServer().isConnected()) {
-				this.engine.getMediaServer().addEventListener(MediaServerEvent.CONNECTED, this.onMediaServerConnected);
-			} else {
-				this.onMediaServerConnected();
-			}
 
 			this.engine.addEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
 			this.engine.addEventListener(EngineEvent.WALL_CONFIG_UPDATE_LOADED, this.onWallConfigUpdate);
@@ -57,6 +52,7 @@ package com.gawk.Wall {
 
 			this.createWall();
 			this.addShroud();
+			this.setupRecordNewVideoClick();
 		}
 		
 		protected function createWall():void {
@@ -137,12 +133,8 @@ package com.gawk.Wall {
 		}
 		
 		protected function onRecordNewButtonClick():void {
-			if (this.engine.getMediaServer().isConnected()) {
-				if (!this.getCameraTile().isMuted()) {
-					this.addCameraToTile(this.getWaitingTile());
-				}
-			} else {
-				this.engine.logger.addLog(Logger.LOG_ERROR, "Trying to record without Media Server connection");
+			if (!this.getCameraTile().isMuted()) {
+				this.addCameraToTile(this.getWaitingTile());
 			}
 		}
 		
@@ -207,7 +199,7 @@ package com.gawk.Wall {
 			this.toggleWallPause(false);
 		}
 		
-		protected function onMediaServerConnected(event:MediaServerEvent = null):void {
+		protected function setupRecordNewVideoClick(event:EngineEvent = null):void {
 			ExternalInterface.addCallback("recordNewFromExternal", this.onRecordNewButtonClick);
 		}
 		

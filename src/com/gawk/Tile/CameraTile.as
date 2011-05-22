@@ -57,9 +57,9 @@ package com.gawk.Tile {
 				ExternalInterface.call("$(document).trigger", "GawkUINoWebcamOverlayShow");
 				return false;
 			}
-			this.camera.setMode(Tile.getWidth(), Tile.getHeight(), 17, true);
+			this.camera.setMode(Tile.getWidth(), Tile.getHeight(), 15, true);
 			this.camera.setQuality(22500, 0);
-			this.camera.setKeyFrameInterval(100);
+			this.camera.setKeyFrameInterval(15);
 			
 			this.parentTile.getEngine().getMediaServer().setCamera(this.camera);
 			
