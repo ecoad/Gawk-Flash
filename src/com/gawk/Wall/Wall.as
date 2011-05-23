@@ -27,8 +27,10 @@ package com.gawk.Wall {
 		
 		public var wallWidth:int;
 		public var wallHeight:int;
-		public const WALL_WIDTH:int = 1920; //booth
-		public const WALL_HEIGHT:int = 1150;
+//		public const WALL_WIDTH:int = 1920; //booth
+//		public const WALL_HEIGHT:int = 1150;
+		public const WALL_WIDTH:int = 1024; //booth projector
+		public const WALL_HEIGHT:int = 768;
 //		public const WALL_WIDTH:int = 1920; //booth short
 //		public const WALL_HEIGHT:int = 920; 
 //		public const WALL_WIDTH:int = 1050; //main

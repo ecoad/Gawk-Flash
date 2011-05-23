@@ -11,11 +11,7 @@ package com.gawk.Tile {
 	import flash.display.MovieClip;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.events.StageVideoAvailabilityEvent;
-	import flash.events.StageVideoEvent;
 	import flash.geom.Rectangle;
-	import flash.media.StageVideo;
-	import flash.media.StageVideoAvailability;
 	import flash.media.Video;
 	
 	public class VideoTile extends MovieClip {
@@ -43,6 +39,7 @@ package com.gawk.Tile {
 		}
 		
 		public function loadVideo(stageIndex:int = -1):void {
+			/*
 			if (!this.parentTile.getEngine().allowStageVideo()) {
 				this.video = new Video();
 				this.addChild(this.video);
@@ -57,6 +54,10 @@ package com.gawk.Tile {
 					this.addChild(this.video);
 				}
 			}
+			*/
+			
+			this.video = new Video();
+			this.addChild(this.video);
 			
 			if (this.getParentTile().getEngine().getMemberControl().isLoggedIn()) {
 				this.addVideoTileOverlay();
@@ -136,12 +137,16 @@ package com.gawk.Tile {
 		}
 		
 		protected function onVideoLoaded(event:VideoLoaderEvent):void {
+			/*
 			if (this.video is StageVideo) {
 				//Stage video resizes onStageVideoStateChange
 			} else {
 				this.video.width = Tile.tileWidth;
 				this.video.height = Tile.tileHeight;
 			}
+			*/
+			this.video.width = Tile.tileWidth;
+			this.video.height = Tile.tileHeight;
 			
 			this.parentTile.getEngine().dispatchEvent(new TileEvent(TileEvent.TILE_LOADED));
 		}
@@ -181,10 +186,11 @@ package com.gawk.Tile {
 		public function getParentTile():Tile {
 			return this.parentTile;
 		}
-		
+		/*
 		protected function onStageVideoStateChange(event:StageVideoEvent):void {
 			var rect:Rectangle = new Rectangle(this.parentTile.movieClip.x ,this.parentTile.movieClip.y ,320,230);
 			this.video.viewPort = rect; 
 		}
+		*/
 	}
 }

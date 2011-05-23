@@ -11,7 +11,7 @@ package com.gawk.Engine {
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
-	import flash.media.StageVideo;
+	//import flash.media.StageVideo;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.system.System;

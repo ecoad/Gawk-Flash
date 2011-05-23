@@ -6,19 +6,19 @@ package {
 	import com.gawk.Wall.Wall;
 	
 	import flash.display.Sprite;
-	import flash.events.StageVideoAvailabilityEvent;
+	//import flash.events.StageVideoAvailabilityEvent;
+	//import flash.media.StageVideo;
+	//import flash.media.StageVideoAvailability;
 	import flash.external.ExternalInterface;
-	import flash.media.StageVideo;
-	import flash.media.StageVideoAvailability;
 	import flash.system.Security;
 
+	[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="655")] //main
 	//[SWF(backgroundColor="#111111", frameRate="15", width="175", height="131")] //profile gawk
 	//[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="131")] //recent profile
-//	[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="655")] //main
-	[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="1150")] //booth
+//	[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="1150")] //booth
 //	[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="920")] //booth short
+//	[SWF(backgroundColor="#111111", frameRate="15", width="1024", height="768")] //main
 	public class GawkFlash extends Sprite {
-		
 		protected var wall:Wall;
 		protected var engine:Engine;
 		
@@ -38,7 +38,6 @@ package {
 			this.engine = new Engine(this.apiLocation, this.wallId, this.loggedInAtInit, this.profileSecureId, this.useStageVideo, this.useDebugOverlay);
 			this.engine.addEventListener(EngineEvent.WALL_CONFIG_LOADED, this.onWallConfigLoaded);
 			
-			stage.addEventListener(StageVideoAvailabilityEvent.STAGE_VIDEO_AVAILABILITY, onStageVideoState);
 		}
 		
 		protected function assignStartupSettings():void {
@@ -69,16 +68,13 @@ package {
 			this.wall = new Wall(engine);
 			this.addChild(this.wall);
 			
+			/*
 			try {
 				var stageVideos:Vector.<StageVideo> = this.stage.stageVideos;
 				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "# of stageVideos: " + this.stage.stageVideos.length);
 			} catch (error:Error) {
 			}
-		}
-		
-		protected function onStageVideoState(event:StageVideoAvailabilityEvent):void {
-			var available:Boolean = (event.availability == StageVideoAvailability.AVAILABLE);
-			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "stageVideos avail change: " + available.toString());
+			*/
 		}
 	}
 }
