@@ -31,13 +31,15 @@ package com.gawk.MediaServer {
 		
 		public function MediaServer(engine:Engine) {
 			this.engine = engine;
+			
+			this.addEventListener(MediaServerEvent.CONNECTED, onMediaServerConnected);
 		}
 		
 		public function setCamera(camera:Camera):void {
 			this.camera = camera;
 		}
 		
-		public function connectToMediaServer():void {
+		protected function connectToMediaServer():void {
 			if (this.netConnection === null) {
 				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connecting to Media Server... " + engine.getMediaServerLocation());
 				this.netConnection = new NetConnection();
@@ -56,8 +58,8 @@ package com.gawk.MediaServer {
 			switch (infoObject.info.code) {
 				case "NetConnection.Connect.Success":
 					this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Connected to Media Server: " + engine.getMediaServerLocation());
-					this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTED));
 					this.connected = true;
+					this.dispatchEvent(new MediaServerEvent(MediaServerEvent.CONNECTED));
 					break;
 				case "NetConnection.Connect.Failed":
 					this.engine.logger.addLog(Logger.LOG_ERROR, "Cannot connect to Media Server: " + engine.getMediaServerLocation()); 
@@ -68,7 +70,16 @@ package com.gawk.MediaServer {
 			}
 		}
 		
+		protected function onMediaServerConnected(event:MediaServerEvent):void {
+			startPublishing();
+		}
+		
 		public function startPublishing():void {
+			
+			if (!this.connected) {
+				this.connectToMediaServer();
+				return
+			}
 			
 			this.currentFileName = this.engine.getUniqueFileName();
 			

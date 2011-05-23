@@ -90,7 +90,7 @@ package com.utils
 			_m.scroll(1,0);
 			_m.setPixel32(1,MONITOR_H-(_fps/MONITOR_FPS_MAX*MONITOR_H),MONITOR_FPS_COLOR);
 			_m.setPixel32(1,MONITOR_H-(_mem/MONITOR_MEM_MAX*MONITOR_H),MONITOR_MEM_COLOR);
-			_fpstxt.text=_playerVersion+"\nStageVideo: " + stage.stageVideos.length +"\nFPS: "+ _fps+"\nMEM: "+_mem.toString().substr(0,5);
+			_fpstxt.text=_playerVersion+"\nFPS: "+ _fps+"\nMEM: "+_mem.toString().substr(0,5);
 		}
 		
 		

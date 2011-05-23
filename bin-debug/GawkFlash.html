@@ -21,36 +21,51 @@
 // -----------------------------------------------------------------------------
 // Globals
 // Major version of Flash required
-var requiredMajorVersion = 10;
+var requiredMajorVersion = 9;
 // Minor version of Flash required
-var requiredMinorVersion = 2;
+var requiredMinorVersion = 0;
 // Minor version of Flash required
-var requiredRevision = 0;
+var requiredRevision = 124;
 // -----------------------------------------------------------------------------
 // -->
 </script>
 </head>
-
+<body scroll="no">
 <ul>
   <li><a href="#" onclick="recordNew();">Record</a></li>
-  <!-- <li><a href="#" onclick="loginMember();">Login Member</a></li> -->
-  <!-- <li><a href="#" onclick="logOutMember();">Logout Member</a></li> -->
+  <li><a href="#" id="login-link" onclick="loginMember();">Login Member</a></li>
+  <li><a href="#" id="logout-link" style="display: none;" onclick="logOutMember();">Logout Member</a></li>
 </ul>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script> 
 <script type="text/javascript">
+	var apiLocation = "http://furnace.gawkwall.com/api/";
+	function loginMember() {
+		$.post(apiLocation, {
+			Action: "Member.Login",
+			EmailAddress: "test@clock.co.uk",
+			Password: "secret"
+		}, function(response) {
+			if (response.success) {
+				$("#login-link").hide();
+				$("#logout-link").show();
+				document.getElementById('GawkFlash').logInFromExternal();
+			}
+			
+		}, "json");
+	}
+	
+	function logOutMember() {
+		$.getJSON(apiLocation, {Action: "Member.Logout"}, function () {
+			$("#login-link").show();
+			$("#logout-link").hide();
+			document.getElementById('GawkFlash').logOutFromExternal();
+		});
+	}
+	
   function recordNew() {
     document.getElementById('GawkFlash').recordNewFromExternal();
   }
 
-  function loginMember() {
-    document.getElementById('GawkFlash').logInFromExternal();
-  }
-
-  function logOutMember() {
-    document.getElementById('GawkFlash').logOutFromExternal();
-  }
-</script>
-<script language="JavaScript" type="text/javascript">
-<!--
 // Version check for the Flash Player that has the ability to start Player Product Install (6.0r65)
 var hasProductInstall = DetectFlashVer(6, 0, 65);
 
@@ -68,8 +83,8 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	AC_FL_RunContent(
 		"src", "playerProductInstall",
 		"FlashVars", "MMredirectURL="+MMredirectURL+'&MMplayerType='+MMPlayerType+'&MMdoctitle='+MMdoctitle+"",
-		"width", "1920",
-		"height", "1150",
+		"width", "1050",
+		"height", "655",
 		"align", "middle",
 		"id", "GawkFlash",
 		"quality", "high",
@@ -84,11 +99,11 @@ if ( hasProductInstall && !hasRequestedVersion ) {
 	// embed the Flash Content SWF when all tests are passed
 	AC_FL_RunContent(
 			"src", "GawkFlash",
-			"flashVars", "apiLocation=http://staging.gawkwall.com/api/&wallId=gawk&useStageVideo=false&useDebugOverlay=true",
+			"flashVars", "apiLocation=" + apiLocation + "&wallId=gawk&useStageVideo=false&useDebugOverlay=true",
 //			"flashVars", "apiLocation=http://furnace.gawkwall.com/api/&wallId=profile-recent&profileSecureId=u-4dc5457e5a441",
-			"width", "1920",
-			"wmode", "direct",
-			"height", "1150",
+			"width", "1050",
+			"wmode", "window",
+			"height", "655",
 			"align", "middle",
 			"id", "GawkFlash",
 			"quality", "high",
@@ -104,18 +119,17 @@ if ( hasProductInstall && !hasRequestedVersion ) {
    	+ '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
     document.write(alternateContent);  // insert non-flash content
   }
-// -->
 </script>
 <noscript>
   	<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="GawkFlash" width="1920" height="1150"
+			id="GawkFlash" width="1050" height="655"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
 			<param name="movie" value="GawkFlash.swf" />
 			<param name="quality" value="high" />
 			<param name="bgcolor" value="#111111" />
 			<param name="allowScriptAccess" value="sameDomain" />
 			<embed src="GawkFlash.swf" quality="high" bgcolor="#111111"
-				width="1920" height="1150" name="GawkFlash" align="middle"
+				width="1050" height="655" name="GawkFlash" align="middle"
 				play="true"
 				loop="false"
 				quality="high"

@@ -21,7 +21,6 @@ package com.gawk.Tile {
 		protected var videoLoader:VideoLoader;
 		
 		protected var video:*;
-		//protected var stageVideo:StageVideo;
 		
 		protected var newlySubmitted:Boolean;
 		
@@ -39,32 +38,13 @@ package com.gawk.Tile {
 		}
 		
 		public function loadVideo(stageIndex:int = -1):void {
-			/*
-			if (!this.parentTile.getEngine().allowStageVideo()) {
-				this.video = new Video();
-				this.addChild(this.video);
-			} else {
-				try {
-					this.video = stage.stageVideos[stageIndex];
-					this.video.addEventListener(StageVideoEvent.RENDER_STATE, onStageVideoStateChange);
-					this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "using StageVideo!");
-				} catch (error:Error) {
-					this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "using Video");
-					this.video = new Video();
-					this.addChild(this.video);
-				}
-			}
-			*/
-			
 			this.video = new Video();
 			this.addChild(this.video);
 			
-			if (this.getParentTile().getEngine().getMemberControl().isLoggedIn()) {
-				this.addVideoTileOverlay();
-			}
+			this.addVideoTileOverlay();
 			
 			if (this.newlySubmitted) {
-				this.addRecordUI();
+				this.addReRecordUI();
 			}
 			
 			this.playVideo();
@@ -92,7 +72,7 @@ package com.gawk.Tile {
 			}
 		}
 
-		protected function addRecordUI():void {
+		protected function addReRecordUI():void {
 			if (this.reRecordButton === null) {
 				this.addReRecordButton();
 				this.addSaveButton();
@@ -137,14 +117,6 @@ package com.gawk.Tile {
 		}
 		
 		protected function onVideoLoaded(event:VideoLoaderEvent):void {
-			/*
-			if (this.video is StageVideo) {
-				//Stage video resizes onStageVideoStateChange
-			} else {
-				this.video.width = Tile.tileWidth;
-				this.video.height = Tile.tileHeight;
-			}
-			*/
 			this.video.width = Tile.tileWidth;
 			this.video.height = Tile.tileHeight;
 			
@@ -186,11 +158,5 @@ package com.gawk.Tile {
 		public function getParentTile():Tile {
 			return this.parentTile;
 		}
-		/*
-		protected function onStageVideoStateChange(event:StageVideoEvent):void {
-			var rect:Rectangle = new Rectangle(this.parentTile.movieClip.x ,this.parentTile.movieClip.y ,320,230);
-			this.video.viewPort = rect; 
-		}
-		*/
 	}
 }

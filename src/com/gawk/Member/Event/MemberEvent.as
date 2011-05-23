@@ -16,6 +16,8 @@ package com.gawk.Member.Event {
 		
 		public static const MEMBER_LOGGED_IN:String = "memberLoggedIn";
 		public static const MEMBER_LOGGED_OUT:String = "memberLoggedOut";
+		public static const MEMBER_VIDEO_ADD_RATING_REQUEST:String = "memberVideoRatingRequest";
+		public static const MEMBER_VIDEO_ADD_RATING_RESPONSE:String = "memberVideoRatingResponse";
 		
 		public var data:*;
 		

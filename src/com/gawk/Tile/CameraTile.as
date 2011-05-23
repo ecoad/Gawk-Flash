@@ -52,14 +52,14 @@ package com.gawk.Tile {
 		
 		public function loadCamera():Boolean {
 			this.camera = Camera.getCamera();
-			if ((this.camera === null) || (this.camera.muted == true)) {
+			if (this.camera === null) {
 				this.parentTile.getEngine().logger.addLog(Logger.LOG_ACTIVITY, "No camera detected");
 				ExternalInterface.call("$(document).trigger", "GawkUINoWebcamOverlayShow");
 				return false;
 			}
-			this.camera.setMode(Tile.getWidth(), Tile.getHeight(), 17, true);
+			this.camera.setMode(Tile.getWidth(), Tile.getHeight(), 15, true);
 			this.camera.setQuality(22500, 0);
-			this.camera.setKeyFrameInterval(100);
+			this.camera.setKeyFrameInterval(15);
 			
 			this.parentTile.getEngine().getMediaServer().setCamera(this.camera);
 			

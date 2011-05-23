@@ -11,7 +11,6 @@ package com.gawk.Engine {
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.TimerEvent;
-	//import flash.media.StageVideo;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.system.System;
@@ -28,7 +27,7 @@ package com.gawk.Engine {
 		protected var wallSecureId:String;
 		protected var profileSecureId:String;
 		protected var mediaServerLocation:String;
-		protected var serviceLocation:String;
+		protected var apiLocation:String;
 		protected var binaryLocation:String;
 		protected var randomWallId:String;
 		protected var useStageVideo:Boolean;
@@ -42,12 +41,11 @@ package com.gawk.Engine {
 		protected var retrievingLoggedInMember:Boolean = false;
 		protected var wallConfigUpdateTimer:Timer;
 		
-		public function Engine(serviceLocation:String, wallSecureId:String, loggedInAtInit:Boolean, profileSecureId:String, useStageVideo:Boolean, useDebugOverlay:Boolean) {
+		public function Engine(apiLocation:String, wallSecureId:String, loggedInAtInit:Boolean, profileSecureId:String, useDebugOverlay:Boolean) {
 			this.logger = new Logger(this);
 			this.mediaServer = new MediaServer(this);
 			this.memberControl = new MemberControl(this);
 			
-			this.useStageVideo = useStageVideo;
 			this.useDebugOverlay = useDebugOverlay;
 			
 			this.wallConfigUpdateTimer = new Timer(10000);
@@ -55,7 +53,7 @@ package com.gawk.Engine {
 				retrieveWallConfig();
 			});
 			
-			this.serviceLocation = serviceLocation;
+			this.apiLocation = apiLocation;
 			this.wallSecureId = wallSecureId;
 			this.profileSecureId = profileSecureId;
 			this.testSettings = testSettings;
@@ -71,7 +69,7 @@ package com.gawk.Engine {
 		
 		protected function retrieveWallConfig():void {
 			if (this.config === null) {
-				this.logger.addLog(Logger.LOG_ACTIVITY, "Retrieving Wall Config from " + this.serviceLocation);
+				this.logger.addLog(Logger.LOG_ACTIVITY, "Retrieving Wall Config from " + this.apiLocation);
 			}
 			var variables:URLVariables = new URLVariables();
 			if (this.isWallSecureIdSet()) {
@@ -87,7 +85,7 @@ package com.gawk.Engine {
 				variables.PreviousRunTime = this.previousRunTime;
 			}
 			
-			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+			var urlLoader:CustomURLLoader = new CustomURLLoader(this.apiLocation);
 			urlLoader.addEventListener(Event.COMPLETE, this.onWallConfigLoaded);
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
 			urlLoader.loadRequest(URLRequestMethod.GET, variables); 
@@ -119,7 +117,6 @@ package com.gawk.Engine {
 			
 			if (!configLoadedPreviously) {
 				//TODO: Connect to Media Server on demand
-				this.mediaServer.connectToMediaServer();
 				this.logger.addLog(Logger.LOG_ACTIVITY, "Wall Config loaded. Video count: " + this.videos.length);
 				this.dispatchEvent(new EngineEvent(EngineEvent.WALL_CONFIG_LOADED));
 			} else {
@@ -149,7 +146,7 @@ package com.gawk.Engine {
 			
 			this.logger.addLog(Logger.LOG_ACTIVITY, "Saving video: " + variables.Video);
 			
-			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+			var urlLoader:CustomURLLoader = new CustomURLLoader(this.apiLocation);
 			urlLoader.addEventListener(Event.COMPLETE, this.onSaveVideoResponse);
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
 			urlLoader.loadRequest(URLRequestMethod.POST, variables); 
@@ -183,7 +180,7 @@ package com.gawk.Engine {
 			variables.VideoId = action.getId();
 			variables.MemberId = action.getMemberId();
 			
-			var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+			var urlLoader:CustomURLLoader = new CustomURLLoader(this.apiLocation);
 			urlLoader.addEventListener(Event.COMPLETE, this.onSendMemberPanelActionResponse);
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
 			urlLoader.loadRequest(URLRequestMethod.POST, variables);
@@ -213,7 +210,7 @@ package com.gawk.Engine {
 				var variables:URLVariables = new URLVariables();
 				variables.Action = "Member.GetLoggedInMember";
 				
-				var urlLoader:CustomURLLoader = new CustomURLLoader(this.serviceLocation);
+				var urlLoader:CustomURLLoader = new CustomURLLoader(this.apiLocation);
 				urlLoader.addEventListener(Event.COMPLETE, this.onLoggedInMemberResponse);
 				urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
 				urlLoader.loadRequest(URLRequestMethod.GET, variables);
@@ -236,7 +233,7 @@ package com.gawk.Engine {
 			}			
 		}
 		
-		protected function onIOError(event:IOErrorEvent):void {
+		public function onIOError(event:IOErrorEvent):void {
 			this.logger.addLog(Logger.LOG_ERROR, event.text);
 		}
 		
@@ -322,6 +319,10 @@ package com.gawk.Engine {
 		
 		public function allowDebugOverlay():Boolean {
 			return this.useDebugOverlay;
+		}
+		
+		public function getApiLocation():String {
+			return this.apiLocation;
 		}
 	}
 }
