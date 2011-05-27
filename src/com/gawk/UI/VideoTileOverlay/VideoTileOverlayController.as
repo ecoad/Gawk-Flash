@@ -44,6 +44,7 @@ package com.gawk.UI.VideoTileOverlay {
 				panel.visible = false;
 			});
 			this.panel.favouriteButton.addEventListener(MouseEvent.CLICK, onFavouriteClick);
+			this.panel.viewButton.addEventListener(MouseEvent.CLICK, onViewClick);
 		}
 		
 		protected function setName(name:String):void {
@@ -63,19 +64,13 @@ package com.gawk.UI.VideoTileOverlay {
 			navigateToURL(new URLRequest("/u/" + this.parentTile.getVideoObject().member.alias), "_SELF");
 		}
 		
-		public function onViewGawkClick():void {
-			navigateToURL(
-				new URLRequest(
-					"/u/" + this.parentTile.getVideoObject().member.alias + "/gawk/" + this.parentTile.getVideoObject().secureId), 
-				"_SELF");
-		}
-		
 		protected function onFavouriteClick(event:MouseEvent):void {
 			var action:MemberVideoRatingAction = new MemberVideoRatingAction();
 			action.setVideoSecureId(this.parentTile.getVideoObject().secureId);
 			action.setPositiveRating(true);
 			this.engine.getMemberControl().addEventListener(
 				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onFavouriteClickResponse);
+			
 			this.engine.getMemberControl().dispatchEvent(
 				new MemberEvent(MemberEvent.MEMBER_VIDEO_ADD_RATING_REQUEST, action));
 		}
@@ -83,7 +78,10 @@ package com.gawk.UI.VideoTileOverlay {
 		protected function onFavouriteClickResponse(event:MemberEvent):void {
 			this.engine.getMemberControl().removeEventListener(
 				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onFavouriteClickResponse);
-			showFavouriteButtonIsActive();
+			
+			if (event.data.success) {
+				showFavouriteButtonIsActive();
+			}
 		}
 		
 		protected function showFavouriteButtonIsActive():void {
@@ -113,68 +111,9 @@ package com.gawk.UI.VideoTileOverlay {
 		protected function onDeleteClick(event:MouseEvent):void {
 		}
 		
-		/*
-		public function addButtons():void {
-			this.addFavouriteButton();
-			this.addHateButton();
-			if (this.parentTile.getVideoData().getMemberSecureId() == this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId) {
-				this.addRemoveButton();
-			}
-		}
-		
-		public function addFavouriteButton():void {
-			this.favouriteButton = new TileButton(50, 30, "Fav", 5);
-			this.favouriteButton.x = 5;
-			this.favouriteButton.y = 5;
-			this.panel.addChild(this.favouriteButton);
-			this.favouriteButton.addEventListener(MouseEvent.CLICK, this.onFavouriteButtonClick);
-		}
-		
-		protected function onFavouriteButtonClick(event:MouseEvent):void {
-			
-			var action:Action = new Action({
-				action: "GawkPositiveRating", 
-				videoSecureId: this.parentTile.getVideoData().getSecureId(),
-				memberSecureId: this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId
-			});
-			
-			this.parentTile.getParentTile().getEngine().dispatchEvent(new VideoTileOverlayEvent(VideoTileOverlayEvent.TILE_MEMBER_PANEL_ACTION, action));
-		}
-		
-		public function addHateButton():void {
-			this.hateButton = new TileButton(50, 30, "Hate", 5);
-			this.hateButton.x = 5;
-			this.hateButton.y = 40;
-			this.panel.addChild(this.hateButton);
-			this.hateButton.addEventListener(MouseEvent.CLICK, this.onHateButtonClick);
-		}
-		
-		protected function onHateButtonClick(event:MouseEvent):void {
-			var action:Action = new Action({
-				action: "GawkNegativeRating", 
-				videoSecureId: this.parentTile.getVideoData().getSecureId(),
-				memberSecureId: this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId
-			});
-			
-			this.parentTile.getParentTile().getEngine().dispatchEvent(new VideoTileOverlayEvent(VideoTileOverlayEvent.TILE_MEMBER_PANEL_ACTION, action));
-		}
-		
-		public function addRemoveButton():void {
-			this.removeButton = new TileButton(50, 30, "Remove", 5);
-			this.removeButton.x = 5;
-			this.removeButton.y = 90;
-			this.panel.addChild(this.removeButton);
-			this.removeButton.addEventListener(MouseEvent.CLICK, this.onRemoveButtonClick);
-		}
-		
-		protected function onRemoveButtonClick(event:MouseEvent):void {
-			var action:Action = new Action({
-				action: "GawkRemove", 
-				videoSecureId: this.parentTile.getVideoData().getSecureId(),
-				memberSecureId: this.parentTile.getParentTile().getEngine().getMemberControl().getMemberData().secureId
-			});
-			
-			this.parentTile.getParentTile().getEngine().dispatchEvent(new VideoTileOverlayEvent(VideoTileOverlayEvent.TILE_MEMBER_PANEL_ACTION, action));
+		protected function onViewClick(event:MouseEvent):void {
+			navigateToURL(new URLRequest("/u/" + this.parentTile.getVideoObject().member.alias + "/gawk/" + 
+				this.parentTile.getVideoObject().secureId), "_self");
 		}
 		
 		public function showRemoveButton():void {
@@ -184,7 +123,7 @@ package com.gawk.UI.VideoTileOverlay {
 		public function hideRemoveButton():void {
 			this.removeButton.visible = false;
 		}
-		*/
+		
 		public function getPanel():VideoTileOverlay {
 			return this.panel;
 		}

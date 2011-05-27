@@ -66,6 +66,16 @@ package com.gawk.Member {
 		}
 		
 		public function addMemberVideoRating(action:MemberVideoRatingAction):void {
+			if (!this.isLoggedIn()) {
+				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Not logged in");
+				this.dispatchEvent(new MemberEvent(MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, {
+					success: false,
+					errors: ["Must be logged in"]
+				}));
+				this.showRequireLoginFromExternal();
+				return;
+			}
+			
 			var positiveRating:String = action.isPositiveRating() ? "true" : "false";
 			
 			var variables:URLVariables = new URLVariables();
@@ -107,6 +117,10 @@ package com.gawk.Member {
 		
 		public function isLoggedIn():Boolean {
 			return this.loggedIn;
+		}
+		
+		public function showRequireLoginFromExternal():void {
+			ExternalInterface.call("$(document).trigger", "GawkUILoginOverlayShow");
 		}
 	}
 }
