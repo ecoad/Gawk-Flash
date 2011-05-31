@@ -37,18 +37,21 @@ package com.gawk.UI.VideoTileOverlay {
 		}
 		
 		protected function addUiEventListeners():void {
-			this.parentTile.addEventListener(MouseEvent.MOUSE_OVER, function (event:MouseEvent):void {
-				panel.visible = true;
-				setProfileVideo();
-			});
-			this.parentTile.addEventListener(MouseEvent.MOUSE_OUT, function (event:MouseEvent):void {
-				panel.visible = false;
-			});
+			this.parentTile.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
+			this.parentTile.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
 			this.panel.favouriteButton.addEventListener(MouseEvent.CLICK, onFavouriteClick);
 			this.panel.viewButton.addEventListener(MouseEvent.CLICK, onViewClick);
 			
 			this.panel.deleteButton.addEventListener(MouseEvent.CLICK, onDeleteClick);
-			
+		}
+		
+		protected function removeUiEventListeners():void {
+			this.onMouseOut();
+			this.parentTile.removeEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
+			this.parentTile.removeEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
+			this.panel.favouriteButton.removeEventListener(MouseEvent.CLICK, this.onFavouriteClick);
+			this.panel.viewButton.removeEventListener(MouseEvent.CLICK, this.onViewClick);
+			this.panel.deleteButton.removeEventListener(MouseEvent.CLICK, this.onDeleteClick);
 		}
 		
 		protected function setName(name:String):void {
@@ -66,6 +69,15 @@ package com.gawk.UI.VideoTileOverlay {
 				this.profileVideo.loadVideo();
 				this.panel.profile.addChild(this.profileVideo.getVideo());
 			}
+		}
+		
+		protected function onMouseOver(event:MouseEvent):void {
+			this.panel.visible = true;
+			this.setProfileVideo();
+		}
+		
+		protected function onMouseOut(event:MouseEvent = null):void {
+			panel.visible = false;
 		}
 		
 		public function onProfileClick():void {
@@ -130,6 +142,11 @@ package com.gawk.UI.VideoTileOverlay {
 			this.engine.getMemberControl().removeEventListener(
 				MemberEvent.MEMBER_VIDEO_DELETE_RESPONSE, this.onMemberVideoDeleteResponse);
 			this.panel.deleteButton.addEventListener(MouseEvent.CLICK, onDeleteClick);
+			
+			if (event.data.success) {
+				this.parentTile.getParentTile().remove();
+				this.removeUiEventListeners();
+			}
 		}
 		
 		protected function onViewClick(event:MouseEvent):void {

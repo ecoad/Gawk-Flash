@@ -112,6 +112,11 @@ package com.gawk.Tile {
 			}
 		}
 		
+		public function remove():void {
+			this.pause();
+			this.videoTile.alpha = 0.4;
+		}
+		
 		protected function onPublishingComplete(event:MediaServerEvent):void {
 			this.engine.getMediaServer().removeEventListener(MediaServerEvent.PUBLISHING_COMPLETE, this.onPublishingComplete);
 			try {
