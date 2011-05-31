@@ -45,6 +45,7 @@ package com.gawk.Tile {
 			
 			if (this.newlySubmitted) {
 				this.addReRecordUI();
+				this.videoTileOverlayController.removeUiEventListeners();
 			}
 			
 			this.playVideo();
@@ -128,15 +129,23 @@ package com.gawk.Tile {
 		}
 		
 		protected function onSaveButtonClick(event:MouseEvent):void {
+			this.saveButton.removeEventListener(MouseEvent.CLICK, this.onSaveButtonClick);
+			
 			this.parentTile.getEngine().saveVideo(this.videoObject.filename);
 			this.parentTile.getEngine().addEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-			this.hideRecordControls();
 		}
 		
 		protected function onVideoSaved(event:EngineEvent):void {
+			this.hideRecordControls();
+			
 			this.parentTile.getEngine().removeEventListener(EngineEvent.VIDEO_SAVED, onVideoSaved);
-			this.videoObject.secureId = event.data.videoId;
-			this.videoObject.memberSecureId = event.data.memberSecureId;
+			var savedVideo:VideoObject = new VideoObject(event.data.video);
+			this.videoObject.secureId = savedVideo.secureId;
+			this.videoObject.memberSecureId = savedVideo.memberSecureId;
+			this.videoObject.member = savedVideo.member;
+			
+			this.videoTileOverlayController.updateView();
+			this.videoTileOverlayController.addUiEventListeners();
 		}
 		
 		public function setVideoObject(videoObject:VideoObject):void {

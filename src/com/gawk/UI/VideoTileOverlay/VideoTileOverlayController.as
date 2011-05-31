@@ -32,11 +32,15 @@ package com.gawk.UI.VideoTileOverlay {
 			this.panel.visible = false;
 			
 			this.addUiEventListeners();
+			this.updateView();
+		}
+		
+		public function updateView():void {
 			this.setName(this.parentTile.getVideoObject().member.alias);
 			this.setDeleteGawkVisible(this.parentTile.getVideoObject().videoControlAuthorised);
 		}
 		
-		protected function addUiEventListeners():void {
+		public function addUiEventListeners():void {
 			this.parentTile.addEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			this.parentTile.addEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
 			this.panel.favouriteButton.addEventListener(MouseEvent.CLICK, onFavouriteClick);
@@ -45,7 +49,7 @@ package com.gawk.UI.VideoTileOverlay {
 			this.panel.deleteButton.addEventListener(MouseEvent.CLICK, onDeleteClick);
 		}
 		
-		protected function removeUiEventListeners():void {
+		public function removeUiEventListeners():void {
 			this.onMouseOut();
 			this.parentTile.removeEventListener(MouseEvent.MOUSE_OVER, this.onMouseOver);
 			this.parentTile.removeEventListener(MouseEvent.MOUSE_OUT, this.onMouseOut);
@@ -62,18 +66,8 @@ package com.gawk.UI.VideoTileOverlay {
 			this.panel.deleteButton.visible = show;
 		}
 		
-		protected function setProfileVideo():void {
-			var profileVideoLocation:String = this.parentTile.getVideoObject().member.profileVideoLocation;
-			if ((profileVideoLocation != "") && (this.profileVideo == null)) {
-				this.profileVideo = new ProfileVideo(this, this.engine, profileVideoLocation);
-				this.profileVideo.loadVideo();
-				this.panel.profile.addChild(this.profileVideo.getVideo());
-			}
-		}
-		
 		protected function onMouseOver(event:MouseEvent):void {
 			this.panel.visible = true;
-			this.setProfileVideo();
 		}
 		
 		protected function onMouseOut(event:MouseEvent = null):void {
@@ -106,22 +100,6 @@ package com.gawk.UI.VideoTileOverlay {
 		
 		protected function showFavouriteButtonIsActive():void {
 			this.panel.favouriteButton.alpha = 1;
-		}
-		
-		protected function onHateClick(event:MouseEvent):void {
-			var action:MemberVideoRatingAction = new MemberVideoRatingAction();
-			action.setVideoSecureId(this.parentTile.getVideoObject().secureId);
-			action.setPositiveRating(false);
-			this.engine.getMemberControl().addEventListener(
-				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onHateClickResponse);
-			this.engine.getMemberControl().dispatchEvent(
-				new MemberEvent(MemberEvent.MEMBER_VIDEO_ADD_RATING_REQUEST, action));
-		}
-		
-		protected function onHateClickResponse(event:MemberEvent):void {
-			this.engine.getMemberControl().removeEventListener(
-				MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, this.onHateClickResponse);
-			showHateButtonIsActive();
 		}
 		
 		protected function showHateButtonIsActive():void {

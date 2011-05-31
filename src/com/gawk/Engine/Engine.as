@@ -158,6 +158,7 @@ package com.gawk.Engine {
 				
 				if (response.success) {
 					this.dispatchEvent(new EngineEvent(EngineEvent.VIDEO_SAVED, response));
+					this.videos.push(new VideoObject(response.video));
 					this.logger.addLog(Logger.LOG_ACTIVITY, "Video saved");
 				} else {
 					this.logger.addLog(Logger.LOG_ERROR, "Video not saved");
@@ -169,39 +170,6 @@ package com.gawk.Engine {
 				this.logger.addLog(Logger.LOG_ERROR, "Could not deserialize Video response"); 
 			}
 		}
-		
-		/*
-		public function onMemberPanelAction(event:VideoTileOverlayEvent):void {
-			var action:Action = event.action;
-			
-			var variables:URLVariables = new URLVariables();
-			variables.Action = "Member.SendMemberPanelAction";
-			variables.MemberAction = action.getAction();
-			variables.VideoId = action.getId();
-			variables.MemberId = action.getMemberId();
-			
-			var urlLoader:CustomURLLoader = new CustomURLLoader(this.apiLocation);
-			urlLoader.addEventListener(Event.COMPLETE, this.onSendMemberPanelActionResponse);
-			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.onIOError);
-			urlLoader.loadRequest(URLRequestMethod.POST, variables);
-			
-			this.logger.addLog(Logger.LOG_ACTIVITY, "Requesting Member Panel Action: " + action.getAction());
-		}
-		
-		protected function onSendMemberPanelActionResponse(event:Event):void {
-			try {
-				var response:Object = JSON.deserialize(event.target.data);
-				
-				if (response.success) {
-					this.logger.addLog(Logger.LOG_ACTIVITY, "Member Panel Action success");
-				} else {
-					this.logger.addLog(Logger.LOG_ERROR, "Member Panel Action failed");
-				}
-			} catch (error:Error) {
-				this.logger.addLog(Logger.LOG_ERROR, "Member Panel Action response: " + event.target.data); 
-			}
-		}
-		*/
 		
 		public function getLoggedInMember():void {
 			if (!retrievingLoggedInMember) {
