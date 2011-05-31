@@ -12,10 +12,8 @@ package {
 	[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="655")] //main
 	//[SWF(backgroundColor="#111111", frameRate="15", width="175", height="131")] //profile gawk
 	//[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="131")] //recent profile
-	[SWF(backgroundColor="#111111", frameRate="15", width="1050", height="655")] //main
-//	[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="1150")] //booth
-//	[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="920")] //booth short
-//	[SWF(backgroundColor="#111111", frameRate="15", width="1024", height="768")] //main
+	//[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="1150")] //booth
+	//[SWF(backgroundColor="#111111", frameRate="15", width="1920", height="920")] //booth short
 	public class GawkFlash extends Sprite {
 		protected var wall:Wall;
 		protected var engine:Engine;
@@ -48,7 +46,7 @@ package {
 			
 			if (!this.apiLocation) {
 				throw new Error("Must provide API Location");
-			} 
+			}
 		}
 		
 		protected function onWallConfigLoaded(event:EngineEvent):void {

@@ -33,7 +33,8 @@ package com.gawk.Member {
 			ExternalInterface.addCallback("logInFromExternal", this.onLogInFromExternal);
 			ExternalInterface.addCallback("logOutFromExternal", this.onLogOutFromExternal);
 			
-			this.addEventListener(MemberEvent.MEMBER_VIDEO_ADD_RATING_REQUEST, onVideoAddRatingRequest);
+			this.addEventListener(MemberEvent.MEMBER_VIDEO_ADD_RATING_REQUEST, this.onVideoAddRatingRequest);
+			this.addEventListener(MemberEvent.MEMBER_VIDEO_DELETE_REQUEST, this.onMemberVideoDeleteRequest);
 		}
 		
 		protected function onLogInFromExternal():void {
@@ -66,18 +67,7 @@ package com.gawk.Member {
 		}
 		
 		public function addMemberVideoRating(action:MemberVideoRatingAction):void {
-			if (!this.isLoggedIn()) {
-				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Not logged in");
-				this.dispatchEvent(new MemberEvent(MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, {
-					success: false,
-					errors: ["Must be logged in"]
-				}));
-				this.showRequireLoginFromExternal();
-				return;
-			}
-			
 			var positiveRating:String = action.isPositiveRating() ? "true" : "false";
-			
 			var variables:URLVariables = new URLVariables();
 			variables.Action = "MemberRating.AddRating";
 			variables.VideoSecureId = action.getVideoSecureId();
@@ -109,6 +99,44 @@ package com.gawk.Member {
 				}
 			}
 			this.dispatchEvent(new MemberEvent(MemberEvent.MEMBER_VIDEO_ADD_RATING_RESPONSE, response));
+		}
+		
+		protected function onMemberVideoDeleteRequest(event:MemberEvent):void {
+			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Request delete video! " + event.data);
+			this.deleteVideoMemberRequest(event.data);
+		}
+		
+		public function deleteVideoMemberRequest(videoSecureId:String):void {
+			var variables:URLVariables = new URLVariables();
+			variables.Action = "Video.Delete";
+			variables.VideoSecureId = videoSecureId;
+			variables.Token = this.engine.getMemberControl().getMemberData().token;
+			
+			this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Deleting video: " + videoSecureId);
+			
+			var urlLoader:CustomURLLoader = new CustomURLLoader(this.engine.getApiLocation());
+			urlLoader.addEventListener(Event.COMPLETE, this.onDeleteVideoMemberResponse);
+			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, this.engine.onIOError);
+			urlLoader.loadRequest(URLRequestMethod.POST, variables);
+		}
+		
+		protected function onDeleteVideoMemberResponse(event:Event):void {
+			try {
+				var response:Object = JSON.deserialize(event.target.data);
+			} catch (error:Error) {
+				this.engine.logger.addLog(Logger.LOG_ERROR, "Could not deserialize response: " + event.target.data);
+				return;
+			}
+			
+			if (response.success) {
+				this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Video deleted");
+			} else {
+				this.engine.logger.addLog(Logger.LOG_ERROR, "Video not deleted");
+				for each (var error:String in response.errors) {
+					this.engine.logger.addLog(Logger.LOG_ERROR, error);
+				}
+			}
+			this.dispatchEvent(new MemberEvent(MemberEvent.MEMBER_VIDEO_DELETE_RESPONSE, response));
 		}
 		
 		public function getMemberData():Member {

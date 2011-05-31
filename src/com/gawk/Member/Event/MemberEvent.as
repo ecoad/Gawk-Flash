@@ -1,5 +1,5 @@
 /**
- * @copyright Clock Limited 2010
+ * @copyright Clock Limited 20101
  * @package engine
  * @subpackage event
  */
@@ -18,6 +18,8 @@ package com.gawk.Member.Event {
 		public static const MEMBER_LOGGED_OUT:String = "memberLoggedOut";
 		public static const MEMBER_VIDEO_ADD_RATING_REQUEST:String = "memberVideoRatingRequest";
 		public static const MEMBER_VIDEO_ADD_RATING_RESPONSE:String = "memberVideoRatingResponse";
+		public static const MEMBER_VIDEO_DELETE_REQUEST:String = "memberVideoDeleteRequest";
+		public static const MEMBER_VIDEO_DELETE_RESPONSE:String = "memberVideoDeleteResponse";
 		
 		public var data:*;
 		

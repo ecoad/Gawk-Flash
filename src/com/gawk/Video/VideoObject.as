@@ -13,6 +13,7 @@ package com.gawk.Video {
 		public var rating:int = 0;
 		public var dateCreated:String = "";
 		public var newVideoAfterInit:Boolean = false;
+		public var videoControlAuthorised:Boolean = false;
 		
 		public function VideoObject(videoData:Object = null) {
 			
@@ -45,6 +46,10 @@ package com.gawk.Video {
 			
 			if (videoData.newVideoAfterInit !== null) {
 				this.newVideoAfterInit = videoData.newVideoAfterInit;
+			}
+			
+			if (videoData.videoControlAuthorised) {
+				this.videoControlAuthorised = videoData.videoControlAuthorised;
 			}
 		}
 		

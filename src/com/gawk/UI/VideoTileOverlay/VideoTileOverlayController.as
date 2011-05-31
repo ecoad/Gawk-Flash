@@ -33,6 +33,7 @@ package com.gawk.UI.VideoTileOverlay {
 			
 			this.addUiEventListeners();
 			this.setName(this.parentTile.getVideoObject().member.alias);
+			this.setDeleteGawkVisible(this.parentTile.getVideoObject().videoControlAuthorised);
 		}
 		
 		protected function addUiEventListeners():void {
@@ -45,10 +46,17 @@ package com.gawk.UI.VideoTileOverlay {
 			});
 			this.panel.favouriteButton.addEventListener(MouseEvent.CLICK, onFavouriteClick);
 			this.panel.viewButton.addEventListener(MouseEvent.CLICK, onViewClick);
+			
+			this.panel.deleteButton.addEventListener(MouseEvent.CLICK, onDeleteClick);
+			
 		}
 		
 		protected function setName(name:String):void {
 			this.panel.profile.aliasText.text = name;
+		}
+		
+		protected function setDeleteGawkVisible(show:Boolean):void {
+			this.panel.deleteButton.visible = show;
 		}
 		
 		protected function setProfileVideo():void {
@@ -109,19 +117,24 @@ package com.gawk.UI.VideoTileOverlay {
 		}
 		
 		protected function onDeleteClick(event:MouseEvent):void {
+			this.panel.deleteButton.removeEventListener(MouseEvent.CLICK, onDeleteClick);
+
+			this.engine.getMemberControl().addEventListener(
+				MemberEvent.MEMBER_VIDEO_DELETE_RESPONSE, this.onMemberVideoDeleteResponse);
+			
+			this.engine.getMemberControl().dispatchEvent(
+				new MemberEvent(MemberEvent.MEMBER_VIDEO_DELETE_REQUEST, this.parentTile.getVideoObject().secureId));
+		}
+		
+		protected function onMemberVideoDeleteResponse(event:MemberEvent):void {
+			this.engine.getMemberControl().removeEventListener(
+				MemberEvent.MEMBER_VIDEO_DELETE_RESPONSE, this.onMemberVideoDeleteResponse);
+			this.panel.deleteButton.addEventListener(MouseEvent.CLICK, onDeleteClick);
 		}
 		
 		protected function onViewClick(event:MouseEvent):void {
 			navigateToURL(new URLRequest("/u/" + this.parentTile.getVideoObject().member.alias + "/gawk/" + 
 				this.parentTile.getVideoObject().secureId), "_self");
-		}
-		
-		public function showRemoveButton():void {
-			this.removeButton.visible = true;
-		}
-		
-		public function hideRemoveButton():void {
-			this.removeButton.visible = false;
 		}
 		
 		public function getPanel():VideoTileOverlay {
