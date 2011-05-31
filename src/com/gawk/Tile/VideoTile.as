@@ -143,6 +143,7 @@ package com.gawk.Tile {
 			this.videoObject.secureId = savedVideo.secureId;
 			this.videoObject.memberSecureId = savedVideo.memberSecureId;
 			this.videoObject.member = savedVideo.member;
+			this.videoObject.videoControlAuthorised = true;
 			
 			this.videoTileOverlayController.updateView();
 			this.videoTileOverlayController.addUiEventListeners();
