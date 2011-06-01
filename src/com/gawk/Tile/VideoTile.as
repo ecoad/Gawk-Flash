@@ -99,7 +99,11 @@ package com.gawk.Tile {
 		
 		protected function addReRecordButton():void {
 			this.reRecordButton = new TileButton(90, 20, "Re-Record", -1);
-			this.reRecordButton.y = Tile.getHeight() + 5;
+			if (this.parentTile.isTileAtBottomOfWall()) {
+				this.reRecordButton.y = -50;
+			} else {
+				this.reRecordButton.y = Tile.getHeight() + 5;
+			}
 			this.reRecordButton.x = 5;
 			
 			this.reRecordButton.addEventListener(MouseEvent.CLICK, this.onReRecordButtonClick);

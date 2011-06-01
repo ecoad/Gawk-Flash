@@ -33,6 +33,7 @@ package com.gawk.Tile {
 				this.parentTile.getEngine().getMediaServer().addEventListener(MediaServerEvent.PUBLISHING_COMPLETE, this.onPublishingComplete);
 				this.parentTile.getEngine().getMediaServer().addEventListener(MediaServerEvent.PUBLISHING_STOPPED, this.onPublishingStopped);
 			}
+			this.setUiPosition();
 			this.recordButton.setLabelText("Record");
 			this.video.visible = true;
 			this.getParentTile().getEngine().dispatchEvent(new TileEvent(TileEvent.CAMERA_ADDED));
@@ -82,7 +83,6 @@ package com.gawk.Tile {
 		
 		protected function addRecordButton():void {
 			this.recordButton = new TileButton(90, 20, "Record", -1);
-			this.recordButton.y = Tile.getHeight() + 5;
 			this.recordButton.x = 5;
 			
 			this.recordButton.addEventListener(MouseEvent.CLICK, this.onRecordButtonClick);
@@ -92,12 +92,21 @@ package com.gawk.Tile {
 		
 		protected function addCancelButton():void {
 			this.cancelButton = new TileButton(90, 20, "Cancel", -1);
-			this.cancelButton.y = this.recordButton.y + this.recordButton.height + 2;
+			
 			this.cancelButton.x = 5;
 			
 			this.cancelButton.addEventListener(MouseEvent.CLICK, this.onCancelButtonClick);
 			
 			this.addChild(this.cancelButton);			
+		}
+		
+		protected function setUiPosition():void {
+			if (this.parentTile.isTileAtBottomOfWall()) {
+				this.recordButton.y = -50;
+			} else {
+				this.recordButton.y = Tile.getHeight() + 5;
+			}
+			this.cancelButton.y = this.recordButton.y + this.recordButton.height + 2;
 		}
 		
 		protected function onRecordButtonClick(event:MouseEvent):void {

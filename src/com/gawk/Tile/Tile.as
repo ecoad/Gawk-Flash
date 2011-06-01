@@ -49,6 +49,7 @@ package com.gawk.Tile {
 			if (this.videoTile !== null) {
 				this.movieClip.addChild(this.videoTile);
 			}
+			isTileAtBottomOfWall();
 		}
 		
 		public function createCameraTile(autoRecord:Boolean = false):void {
@@ -131,5 +132,12 @@ package com.gawk.Tile {
 		public function getEngine():Engine {
 			return this.engine;
 		} 
+		
+		public function isTileAtBottomOfWall():Boolean {
+			if ((this.movieClip.y + Tile.tileHeight) >= Wall.WALL_HEIGHT) {
+				return true;
+			}
+			return false;
+		}
 	}
 }

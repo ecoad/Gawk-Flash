@@ -31,8 +31,8 @@ package com.gawk.Wall {
 //		public const WALL_HEIGHT:int = 1150;
 //		public const WALL_WIDTH:int = 1920; //booth short
 //		public const WALL_HEIGHT:int = 920; 
-		public const WALL_WIDTH:int = 1050; //main
-		public const WALL_HEIGHT:int = 655;
+		public static const WALL_WIDTH:int = 1050; //main
+		public static const WALL_HEIGHT:int = 655;
 //		public const WALL_WIDTH:int = 1050; //recent
 //		public const WALL_HEIGHT:int = 131;
 //		public const WALL_WIDTH:int = 175; //profile
