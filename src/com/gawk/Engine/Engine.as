@@ -13,7 +13,6 @@ package com.gawk.Engine {
 	import flash.events.TimerEvent;
 	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
-	import flash.system.System;
 	import flash.utils.Timer;
 	
 	public class Engine	extends EventDispatcher {
@@ -268,14 +267,23 @@ package com.gawk.Engine {
 			}
 		}
 		
-		protected function isVideoIdAlreadyInCollection(secureId:String):Boolean {
+		protected function getVideoBySecureId(secureId:String):VideoObject {
 			var videosLength:int = this.videos.length;
 			for (var i:int = 0; i < videosLength; i++) {
 				var videoObject:VideoObject = this.videos[i];
 				if (videoObject.secureId == secureId) {
-					this.logger.addLog(Logger.LOG_ACTIVITY, "Video: " + secureId + " duplicate");
-					return true;
+					return videoObject;
 				}
+			}
+			
+			return null;
+		}
+		
+		protected function isVideoIdAlreadyInCollection(secureId:String):Boolean {
+			var videoObject:VideoObject = this.getVideoBySecureId(secureId);
+			if (videoObject) {
+				this.logger.addLog(Logger.LOG_ACTIVITY, "Video: " + secureId + " duplicate");
+				return true;
 			}
 			
 			return false;
@@ -291,6 +299,13 @@ package com.gawk.Engine {
 		
 		public function getApiLocation():String {
 			return this.apiLocation;
+		}
+		
+		public function setLocalVideoRating(videoSecureId:String, positiveRating:Boolean):void {
+			var videoObject:VideoObject = this.getVideoBySecureId(videoSecureId);
+			if (videoObject) {
+				videoObject.member.videoPositiveRated = positiveRating;
+			}
 		}
 	}
 }

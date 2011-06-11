@@ -10,6 +10,8 @@ package com.gawk.Member {
 		public var token:String = "";
 		public var profileVideoSecureId:String = "";
 		public var profileVideoLocation:String = "";
+		public var videoControlAuthorised:Boolean = false;
+		public var videoPositiveRated:Boolean = false;
 		
 		public function Member(memberData:Object = null) {
 			if (memberData) {
@@ -52,6 +54,14 @@ package com.gawk.Member {
 			
 			if (memberData.token) {
 				this.token = memberData.token;
+			}
+			
+			if (memberData.videoPositiveRated) {
+				this.videoPositiveRated = memberData.videoPositiveRated;
+			}
+			
+			if (memberData.videoControlAuthorised) {
+				this.videoControlAuthorised = memberData.videoControlAuthorised;
 			}
 		}
 		

@@ -5,7 +5,6 @@ package com.gawk.Member {
 	import com.gawk.Member.Event.MemberEvent;
 	import com.gawk.Member.VideoAction.MemberVideoRatingAction;
 	import com.gawk.URLLoader.CustomURLLoader;
-	import com.gawk.Video.VideoObject;
 	import com.utils.JSON;
 	
 	import flash.events.Event;
@@ -20,6 +19,7 @@ package com.gawk.Member {
 		protected var engine:Engine;
 		protected var memberData:Member;
 		protected var loggedIn:Boolean = false;
+		protected var currentVideoRatingAction:MemberVideoRatingAction;
 		
 		public function MemberControl(engine:Engine) {
 			this.engine = engine;
@@ -67,12 +67,22 @@ package com.gawk.Member {
 		}
 		
 		public function addMemberVideoRating(action:MemberVideoRatingAction):void {
+			if (!this.isLoggedIn()) {
+				this.showRequireLoginFromExternal();
+				return;
+			}
+			
+			this.currentVideoRatingAction = action;
+			
 			var positiveRating:String = action.isPositiveRating() ? "true" : "false";
 			var variables:URLVariables = new URLVariables();
 			variables.Action = "MemberRating.AddRating";
 			variables.VideoSecureId = action.getVideoSecureId();
 			variables.PositiveRating = positiveRating;
 			variables.Token = this.engine.getMemberControl().getMemberData().token;
+			
+			this.engine.setLocalVideoRating(this.currentVideoRatingAction.getVideoSecureId(), 
+				this.currentVideoRatingAction.isPositiveRating());
 			
 			this.engine.logger.addLog(Logger.LOG_ACTIVITY, 
 					"Adding member rating: " + action.getVideoSecureId() + " positive: " + positiveRating);
@@ -148,6 +158,7 @@ package com.gawk.Member {
 		}
 		
 		public function showRequireLoginFromExternal():void {
+		this.engine.logger.addLog(Logger.LOG_ACTIVITY, "Login required to modify favourite");
 			ExternalInterface.call("$(document).trigger", "GawkUILoginOverlayShow");
 		}
 	}

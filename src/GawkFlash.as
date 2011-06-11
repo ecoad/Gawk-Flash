@@ -25,15 +25,12 @@ package {
 		protected var useDebugOverlay:Boolean = false;
 		
 		public function GawkFlash() {
-			trace("cock");
-			/*
 			Security.allowDomain("salt.gawkwall.com");
 			
 			this.assignStartupSettings();
 		
 			this.engine = new Engine(this.apiLocation, this.wallId, this.loggedInAtInit, this.profileSecureId, this.useDebugOverlay);
 			this.engine.addEventListener(EngineEvent.WALL_CONFIG_LOADED, this.onWallConfigLoaded);
-			*/
 		}
 		
 		protected function assignStartupSettings():void {
